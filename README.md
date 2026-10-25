@@ -40,6 +40,9 @@ Small samples, and several things changed at once, so read the case study's cave
 
 ## Quick start
 
+**Starting from zero?** Follow the step-by-step [setup guide](docs/SETUP.md): what to install on macOS, Linux or
+Windows, the AI agent, and what to have ready for the first session.
+
 You need Python 3.10+, Google Chrome (or Chromium/Edge) and poppler (`pdftotext`; macOS `brew install poppler`,
 Ubuntu `sudo apt install poppler-utils`). Clone this repository (the green Code button on GitHub gives the URL), then:
 
@@ -134,7 +137,7 @@ python3 -m pytest tests -q
 - [Applying](docs/APPLYING.md): order, timing, referrals, forms
 - [Working with the AI](docs/WORKING_WITH_AI.md): the rules the agent follows, and why
 - [Evidence](docs/EVIDENCE.md): sources and how strong each one is
-- [ChatGPT and Codex](docs/CHATGPT_AND_CODEX.md) · [Troubleshooting](docs/TROUBLESHOOTING.md)
+- [Setup, step by step](docs/SETUP.md) · [ChatGPT and Codex](docs/CHATGPT_AND_CODEX.md) · [Troubleshooting](docs/TROUBLESHOOTING.md)
 
 ## Scope and limits
 
