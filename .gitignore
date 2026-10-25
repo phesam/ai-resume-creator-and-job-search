@@ -9,3 +9,6 @@ __pycache__/
 *.overflow.pdf
 .venv/
 venv/
+
+# Your own Claude Code permissions for this repo
+.claude/settings.local.json

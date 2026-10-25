@@ -3,6 +3,13 @@
 Start with `python3 -m jobhunt doctor`. It checks Chrome, poppler, the Python packages, the registry, your workspace
 files and the test suite.
 
+**Fewer permission prompts in Claude Code.** The workflow runs the same few commands many times. If you're
+comfortable with that, add this to `.claude/settings.local.json` in the repo (it stays on your machine):
+
+```json
+{ "permissions": { "allow": ["Bash(python3 -m jobhunt:*)", "Bash(python3 -m pytest:*)", "Bash(pdftotext:*)"] } }
+```
+
 ## Resume builds
 
 | Problem | Fix |

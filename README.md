@@ -40,15 +40,19 @@ Small samples, and several things changed at once, so read the case study's cave
 
 ## Quick start
 
-You need Python 3.10+, Google Chrome (or Chromium/Edge) and poppler (`pdftotext`).
+You need Python 3.10+, Google Chrome (or Chromium/Edge) and poppler (`pdftotext`; macOS `brew install poppler`,
+Ubuntu `sudo apt install poppler-utils`). Clone this repository (the green Code button on GitHub gives the URL), then:
 
 ```bash
-git clone <this repository's URL>
 cd ai-resume-creator-and-job-search
+python3 -m venv .venv && source .venv/bin/activate     # Windows: .venv\Scripts\activate
 python3 -m pip install -r requirements.txt
 python3 -m jobhunt init
 python3 -m jobhunt doctor
 ```
+
+`doctor` should end with three TODO lines: your profile, inventory and resume are still templates. The setup skill
+fills them in.
 
 Then, depending on what you have:
 

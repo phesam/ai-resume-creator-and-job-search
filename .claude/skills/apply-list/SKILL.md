@@ -29,8 +29,9 @@ application, fix the review), never the file by hand.
    gets read and ranked with everything else.
 2. If it isn't, or they just want this one: read the posting (`fresh show`, or open it), decide eligibility honestly
    (years, level from the company's ladder, location, clearance, form questions), and add it to
-   `workspace/picks.yaml` with a hand score (`work`, `yoe`, `region`, `where`, `variant`, `career`, and a `note` with
-   what the job is, what matches, the main gap and the pay). Then rebuild the list.
+   `workspace/picks.yaml`: required `company`, `job_id`, `title`, `url`; plus a hand score (`work`, `yoe`, `region`,
+   `where`, `variant`, `career`) and a `note` with what the job is, what matches, the main gap and the pay. Then
+   rebuild the list; it reports any pick missing a required field.
 
 ## Eligibility, decided not asked
 - Don't ask whether they "want" a role they'd qualify for; decide whether they can plausibly get it and say so.

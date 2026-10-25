@@ -37,10 +37,11 @@ From `workspace/inventory.md` and `workspace/profile.yaml`:
   want it.
 
 ## 4. Add the eligible ones
-Add each to `workspace/picks.yaml` (inside `picks:`; skip a job id already there) with a hand score: `work` (0–5, how
-much of the daily work they've done), `yoe`, `region` (a key from the profile), `where`, `variant`, `career` (0–5),
-`posted`, `added`, `url`, `title`, and a two- or three-sentence `note` (what the job is, what matches, the main gap,
-the pay). Then:
+Add each to `workspace/picks.yaml` (inside `picks:`; skip a job id already there). Required: `company` (the registry
+name), `job_id`, `title`, `url`. For it to be listed without a full company run, also a hand score: `work` (0–5, how
+much of the daily work they've done), `yoe`, `region` (a key from the profile), `where`, `variant`, `career` (0–5).
+Also `posted`, `added`, and a two- or three-sentence `note` (what the job is, what matches, the main gap, the pay).
+Quote every string. `python3 -m jobhunt list` reports any pick missing a required field. Then:
 ```bash
 python3 -m jobhunt fresh mark <id> <id> ...   # every id you looked at, read or skipped; pass ids as separate arguments
 python3 -m jobhunt list

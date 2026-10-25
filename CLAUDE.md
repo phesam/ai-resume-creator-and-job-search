@@ -8,7 +8,7 @@ read in full and ranked by callback odds. The user applies themselves.
 
 | The user says | Skill |
 |---|---|
-| "set me up", "get started", or `workspace/` doesn't exist | `setup` |
+| "set me up", "get started", `workspace/` doesn't exist, or `python3 -m jobhunt doctor` prints TODO lines | `setup` |
 | tells you about their work, new results or numbers; "update my inventory" | `inventory-interview` |
 | "write / fix / tighten my resume", "add this to my resume", "make a systems version" | `resume-workshop` |
 | "review my resume", "is my resume good", "will this get callbacks" | `resume-review` |
