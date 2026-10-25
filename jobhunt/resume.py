@@ -457,9 +457,20 @@ def build(yaml_path: Path, out_pdf: Path, variant: str | None = None, target_gap
 
     lo_m = try_t(0.0)
     if lo_m["pages"] > 1:
-        report = {"status": "overflow", "detail": "Content does not fit on one page even at the most compact layout. Cut a bullet or project.", "measure": lo_m}
+        # Never leave an older one-page PDF at this path: it no longer matches the source and could be sent by mistake.
+        removed = [str(p) for p in (out_pdf, out_pdf.with_suffix(".html")) if p.exists()]
+        for p in removed:
+            Path(p).unlink()
         shutil.copy(pdf_tmp, out_pdf.with_suffix(".overflow.pdf"))
-        return report
+        shutil.rmtree(work, ignore_errors=True)
+        return {"status": "overflow", "pages": lo_m["pages"], "measure": lo_m,
+                "detail": f"Content needs {lo_m['pages']} pages even at the most compact layout. Cut a bullet or project "
+                          f"(the weakest internship first, then the weakest project). The over-long render is at "
+                          f"{out_pdf.with_suffix('.overflow.pdf')}" + (f"; the outdated PDF was removed: {removed}" if removed else "."),
+                "lint": [], "short_last_lines": [], "style": []}
+    leftover = out_pdf.with_suffix(".overflow.pdf")
+    if leftover.exists():
+        leftover.unlink()
     hi_m = try_t(1.0)
     best_t, best_m = (1.0, hi_m) if hi_m["pages"] == 1 else (0.0, lo_m)
     if hi_m["pages"] > 1:

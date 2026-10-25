@@ -67,6 +67,20 @@ def test_template_resume_builds_clean(tmp_path):
     assert rep["measure"]["pages"] == 1
 
 
+@pytest.mark.skipif(not resume.find_chrome() or not shutil.which("pdftotext"), reason="needs Chrome and poppler")
+def test_too_much_content_is_refused_and_no_stale_pdf_is_left(tmp_path):
+    data = yaml.safe_load((ROOT / "templates" / "resume.yaml").read_text())
+    data["experience"][0]["bullets"] *= 6          # far more than one page holds
+    src = tmp_path / "resume.yaml"
+    src.write_text(yaml.safe_dump(data, allow_unicode=True))
+    out = tmp_path / "Jordan_Lee_Resume.pdf"
+    out.write_text("an older build")               # a previous one-page PDF that no longer matches the source
+    rep = resume.build(src, out, "general")
+    assert rep["status"] == "overflow" and rep["pages"] >= 2
+    assert not out.exists()                        # nobody can send the outdated file
+    assert out.with_suffix(".overflow.pdf").exists()
+
+
 def test_template_resume_claims_are_all_fictional():
     data = yaml.safe_load((ROOT / "templates" / "resume.yaml").read_text())
     contact = " ".join(data["header"]["contact"])
