@@ -1,0 +1,143 @@
+# Your profile: eligibility, where you want to work, what you want, and how roles are ranked.
+# The setup skill fills this in by asking you. Facts about your work do NOT go here; they go in inventory.md.
+# Every number below has a reason in docs/JOB_SEARCH.md. Change any of them; they are judgment calls, not laws.
+
+name: "Your Name"
+
+# 3-5 sentences the AI screeners and reviewers read before every batch. Plain facts only; inventory.md wins on details.
+summary: >
+  Software engineer with about two years full time (React/TypeScript frontends, Node.js services, Postgres,
+  Kubernetes) plus one internship. B.S. Computer Science. U.S. citizen, no clearance. Wants full-stack or backend
+  roles with real ownership.
+
+# What kinds of roles the title screen should keep. Say it the way you'd tell a friend.
+target_roles: >
+  Software engineering roles: software, full-stack, frontend, backend, platform, infrastructure, data or ML
+  engineering, and new-grad or early-career software programs. Engineering-adjacent roles where coding is a big part
+  (integration, tooling, technical operations) are worth a look. Not hardware, not pure test or analyst roles.
+
+citizenship: "U.S. citizen"   # export-control (ITAR) roles require a U.S. person; say so on the resume if it applies
+clearance: none               # none | secret | top secret | ts/sci
+fulltime_start: 2024-07-01    # years of full-time experience are counted from this date
+graduation: 2024-06           # for new-grad windows ("graduated within the last 12 months")
+
+eligibility:
+  # Postings whose stated minimum is MORE than this are left off everywhere. The case-study candidate, with about
+  # 1.3 years, set 2: a posting asking 3+ years was not a realistic application. A missing years line is not
+  # eligibility: a reviewer judges the level from the company's own ladder.
+  max_required_years: 3
+  exclude_employment_types: [contract, temporary, part-time, part time, intern]
+
+# Where you want to work, best first. `covers` is read by the AI location screener; `hint_places` only feeds the
+# offline regex hint; `broad_match` sends unfamiliar strings to the screener during a sweep; `weight` multiplies scores.
+# Keys must be lowercase letters, digits or _. remote_us, other_us, unknown and non_us are built in (weights below).
+regions:
+  - key: home
+    label: "Southern California"
+    covers: "Los Angeles, Orange, San Diego, Ventura and Santa Barbara counties"
+    hint_places: [los angeles, santa monica, culver city, playa vista, venice, marina del rey, el segundo, hawthorne,
+                  torrance, long beach, burbank, glendale, pasadena, redondo beach, manhattan beach, gardena, carson,
+                  inglewood, west hollywood, hollywood, beverly hills, century city, sherman oaks, van nuys,
+                  north hollywood, chatsworth, canoga park, woodland hills, calabasas, westlake village, thousand oaks,
+                  camarillo, oxnard, ventura, simi valley, santa clarita, valencia, downey, seal beach, cypress,
+                  irvine, costa mesa, santa ana, huntington beach, newport beach, tustin, "orange, ca", anaheim,
+                  fullerton, brea, lake forest, aliso viejo, mission viejo, laguna, san clemente, foothill ranch,
+                  garden grove, fountain valley, buena park, yorba linda, san diego, la jolla, carlsbad, poway,
+                  oceanside, san marcos, escondido, chula vista, el cajon, rancho bernardo, sorrento valley, del mar,
+                  encinitas, kearny mesa, mira mesa, santa barbara, goleta, carpinteria, orange county,
+                  southern california, los angeles metro]
+    broad_match: "california|\\bca\\b"
+    weight: 1.1
+  - key: home_outer
+    label: "Outer Southern California"
+    covers: "The Inland Empire (Riverside and San Bernardino counties, including Ontario, Corona and Temecula), the Antelope Valley (Palmdale, Lancaster, Edwards), Mojave, Ridgecrest/China Lake, Victorville, Vandenberg/Lompoc/Santa Maria, El Centro"
+    hint_places: [palmdale, "lancaster, ca", "lancaster, california", edwards, mojave, ridgecrest, china lake, riverside,
+                  san bernardino, "ontario, ca", "ontario, california", rancho cucamonga, corona, chino, temecula,
+                  murrieta, redlands, victorville, lompoc, vandenberg, santa maria, point mugu, port hueneme,
+                  camp pendleton, twentynine palms, barstow, el centro, moreno valley]
+    weight: 1.0
+  - key: bay_area
+    label: "San Francisco Bay Area"
+    covers: "San Francisco, the Peninsula, San Jose and the South Bay, the East Bay"
+    hint_places: [san francisco, sunnyvale, mountain view, palo alto, menlo park, san jose, santa clara, cupertino,
+                  redwood city, san mateo, foster city, south san francisco, oakland, berkeley, emeryville, fremont,
+                  milpitas, los gatos, campbell, burlingame, san bruno, pleasanton, san carlos, belmont, alameda,
+                  hayward, livermore, bay area]
+    weight: 0.85
+remote_weight: 1.1                     # a remote job lets you live where you want
+elsewhere_weight: 0.65                 # any other US location
+elsewhere_great_company_weight: 0.85   # ...when the reviewer rates the role 5/5 for career value
+unknown_weight: 0.8
+
+# What kinds of work you want, by the reviewer's role_type. 1.0 = no penalty.
+role_preferences:
+  software: 1.0
+  software_physical: 1.0
+  forward_deployed: 0.95
+  systems_engineering: 0.9
+  other: 0.8
+  operations: 0.7
+  test: 0.7
+  analyst: 0.65
+
+# Reviewer's work_match (0-5) -> multiplier. Meeting a posting's minimum list is not a fit when the real work is new.
+work_match_multipliers: {5: 1.0, 4: 0.85, 3: 0.6, 2: 0.35, 1: 0.15, 0: 0.05}
+
+# Reviewer's career_value (0-5) -> 0.7 + 0.06 x value. Niche or dead-end roles drop up to 30%.
+career_value_min_multiplier: 0.7
+
+# Posting age: chance of being seen = floor + (1 - floor) x freshness. Off at companies where you have a referral.
+posting_age:
+  floor: 0.45
+  curve: [[1, 1.0], [3, 0.9], [7, 0.72], [14, 0.48], [21, 0.33], [30, 0.22], [60, 0.12]]   # [age in days up to, freshness]
+  older: 0.06
+  evergreen: 0.6                # always-open program postings
+  unknown: 0.45                 # the hiring system gives no date
+  ai_ranked_ats_stretch: 1.5    # Greenhouse/Ashby rank applicants by match, so age counts 1.5x slower there
+  small_pool_stretch: 1.5       # U.S.-person / clearance-eligible roles draw fewer applicants
+
+# Score cut for repeat cold applications to one company: [your next application would be number N or lower, multiplier].
+# OFF by default. Huntr's 2026 data shows each extra application to a company converts worse, but that is diminishing
+# returns per application, not proof that a good-fit role is hurt by an earlier rejection. To turn it on, use
+# [[1, 1.0], [3, 0.76], [7, 0.55], [null, 0.31]].
+company_volume_multipliers: [[1, 1.0], [3, 1.0], [7, 1.0], [null, 1.0]]
+
+# How many roles a report stars per company per quarter. A guideline (docs/JOB_SEARCH.md, "How many per company").
+apply_cap:
+  large_company: 8
+  startup: 8
+  large_company_min_postings: 200
+
+# People who will actually refer you. A LinkedIn connection who works there is NOT a referral.
+# Company only: they can refer you to any role there; that company's ranking drops posting age and pool pressure.
+# With job_id or title: that one posting is tripled (about 40% of referred candidates reach an interview, vs 3% cold).
+referrals: []
+#  - {company: "Acme Robotics", contact: "Sam (former teammate)"}
+#  - {company: "Globex", contact: "Priya", job_id: "4500123"}
+
+pay:
+  current_base: null            # shown next to roles that pay less; never used to rank
+
+# Resume role families. resume_focus from the reviewer picks one; a variant with posting_must_mention is used only when
+# the posting itself asks for that work (title or required list), or one of or_in_body appears in the description.
+resume_variants:
+  general: {label: "full-stack, product, platform and backend roles", default: true}
+  # systems:
+  #   label: "embedded, C/C++, autonomy, flight or vehicle software"
+  #   posting_must_mention: ["c\\+\\+", "\\bc/c", "\\bembedded\\b", "\\bfirmware\\b", "microcontroller", "\\brtos\\b", "flight software"]
+  #   or_in_body: ["c\\+\\+", "\\bc/c"]
+  # ai:
+  #   label: "LLM, agent and ML tooling roles"
+
+# Optional per-company rules for the apply list, e.g. a company you'd only join for one kind of work or place.
+company_rules: []
+#  - {company: "Initech", only_regions: [home, home_outer], only_role_types: [software_physical],
+#     note: "only physical-systems software in Southern California justifies the pay cut"}
+
+apply_list:
+  per_company_max: 8            # most roles listed per company (minus what you sent there recently)
+  referral_roles_per_company: 3 # you won't ask one person for a dozen referrals
+  local_table: [home, home_outer]   # regions that get their own table, titled with the first one's label
+  uncapped_companies: []        # your top target(s): never cut by per_company_max
+  old_posting_days: 120
+  recent_applications_days: 90

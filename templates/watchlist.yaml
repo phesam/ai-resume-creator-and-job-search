@@ -1,0 +1,6 @@
+# Companies checked by `python3 -m jobhunt watch` and `python3 -m jobhunt fresh list`.
+# Names must match data/companies.yaml (run `python3 -m jobhunt find "<Company>"` once for a company that isn't there).
+# Keep this to the companies you would drop everything for: the point is to apply in a posting's first week.
+companies: []
+#  - Acme Robotics
+#  - Globex

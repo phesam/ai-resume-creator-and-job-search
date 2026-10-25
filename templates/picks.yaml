@@ -1,0 +1,17 @@
+# Roles you asked to track: links you found yourself, or new postings the watch skill added.
+# A pick that matches a run's posting is listed wherever it ranks and is never cut by the per-company cap.
+# A pick with no run behind it needs a hand score to be listed: work (0-5), yoe, region, where, variant, career (0-5).
+picks: []
+#  - company: "Acme Robotics"
+#    job_id: "4500123"
+#    title: "Software Engineer, Fleet Tools"
+#    url: "https://job-boards.greenhouse.io/acme/jobs/4500123"
+#    posted: 2026-10-01
+#    added: 2026-10-03
+#    work: 4
+#    yoe: 1
+#    region: home
+#    where: "Irvine, CA"
+#    variant: general
+#    career: 4
+#    note: "Fleet dashboards in React/TypeScript; matches the internal-tools work. Gap: Go backend. $120-150K."
