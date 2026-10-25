@@ -1,0 +1,172 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Apply list</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one working column; a sticky progress bar, then one table per group, each row led by its checkbox. */
+:root {
+  --bg: #f6f8fb; --surface: #ffffff; --fg: #17202e; --muted: #5d6a7e; --line: #d9e0ea;
+  --accent: #1d4f91; --accent-soft: #e4ecf7; --done: #2f7d57; --warn: #9a5b00; --warn-soft: #fbf1dc;
+  --sans: "IBM Plex Sans", -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #10151d; --surface: #18202b; --fg: #e6ebf3; --muted: #94a1b5; --line: #2a3545;
+  --accent: #8db8f2; --accent-soft: #1f2e45; --done: #6fca9c; --warn: #e6b25a; --warn-soft: #33290f; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #10151d; --surface: #18202b; --fg: #e6ebf3; --muted: #94a1b5; --line: #2a3545;
+  --accent: #8db8f2; --accent-soft: #1f2e45; --done: #6fca9c; --warn: #e6b25a; --warn-soft: #33290f; color-scheme: dark }
+body { background: var(--bg); color: var(--fg); font-family: var(--sans); font-size: 15px; line-height: 1.45; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-inline: 16px; padding-block: 20px 56px; display: flex; flex-direction: column; gap: 22px; }
+h1 { font-size: 26px; font-weight: 600; margin: 0; text-wrap: balance; }
+h2 { font-size: 18px; font-weight: 600; margin: 0; }
+p { margin: 0; }
+.sub { color: var(--muted); max-width: 70ch; }
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 2; background: var(--bg); border-bottom: 1px solid var(--line);
+  padding-block: 10px; display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; }
+.count { font-family: var(--mono); font-size: 14px; font-weight: 500; }
+.meter { flex: 1 1 160px; height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; min-width: 120px; }
+.meter i { display: block; height: 100%; width: 0; background: var(--done); }
+label.toggle { display: inline-flex; gap: 7px; align-items: center; cursor: pointer; color: var(--muted); font-size: 14px; }
+.status { font-size: 13px; color: var(--muted); }
+.status.warn { color: var(--warn); }
+section { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.note { color: var(--muted); font-size: 14px; max-width: 80ch; }
+.scroll { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; }
+table { border-collapse: collapse; width: 100%; min-width: 860px; font-size: 14px; }
+th { text-align: left; font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted);
+  padding: 9px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+td { padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+td.n, td.d { font-family: var(--mono); font-size: 13px; color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+td.c { width: 30px; }
+td.c input { width: 18px; height: 18px; accent-color: var(--done); cursor: pointer; margin: 1px 0 0; }
+td.c input:focus-visible, a:focus-visible, label.toggle input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+a { color: var(--accent); text-decoration: none; font-weight: 500; }
+a:hover { text-decoration: underline; }
+.old { color: var(--warn); }
+.chip { display: inline-block; font-family: var(--mono); font-size: 12px; padding: 1px 7px; border-radius: 3px; background: var(--accent-soft); color: var(--accent); white-space: nowrap; }
+.why { background: var(--warn-soft); color: var(--fg); font-size: 13px; padding: 2px 6px; border-radius: 3px; display: inline-block; margin-top: 3px; }
+tr.done td { color: var(--muted); }
+tr.done a { color: var(--muted); text-decoration: line-through; font-weight: 400; }
+tr.done .chip { background: transparent; color: var(--muted); }
+body.hide-done tr.done { display: none; }
+.empty { padding: 14px; color: var(--muted); font-size: 14px; }
+button.copy { font: inherit; font-size: 13px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); border-radius: 6px; padding: 4px 10px; cursor: pointer; }
+button.copy:hover { border-color: var(--accent); }
+</style></head><body>
+<div class="wrap">
+  <header style="display:flex;flex-direction:column;gap:6px">
+    <h1>Apply list</h1>
+    <p class="sub" id="meta"></p>
+  </header>
+  <div class="bar">
+    <span class="count" id="count">0 of 0 applied</span>
+    <span class="meter"><i id="meter"></i></span>
+    <label class="toggle" for="hide"><input type="checkbox" id="hide"> Hide applied</label>
+    <span class="status" id="status">Loading your checks…</span>
+    <button class="copy" id="copy" type="button">Copy log commands for checked roles</button>
+  </div>
+  <div id="groups" style="display:flex;flex-direction:column;gap:26px"></div>
+</div>
+<script type="application/json" id="data">__DATA__</script>
+<script>
+(function () {
+  var data = JSON.parse(document.getElementById('data').textContent);
+  var groups = document.getElementById('groups');
+  var boxes = {}, total = 0, done = {}, db = null;
+  document.getElementById('meta').textContent = data.updated + '. Check a role off when you have sent the application. ' +
+    'Each table runs from the application you most want sent to the one you would miss least.';
+
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+
+  data.groups.forEach(function (g) {
+    var sec = el('section');
+    sec.appendChild(el('h2', null, g.title + ' (' + g.rows.length + ')'));
+    if (g.note) sec.appendChild(el('p', 'note', g.note));
+    var sc = el('div', 'scroll'), t = el('table'), hr = el('tr');
+    ['', '#', 'Position', 'Company', 'Location', 'Posted', 'Fit · years asked', 'Resume'].concat(g.through ? ['Through'] : []).forEach(function (h) { hr.appendChild(el('th', null, h)); });
+    var th = el('thead'); th.appendChild(hr); t.appendChild(th);
+    var tb = el('tbody');
+    g.rows.forEach(function (r, i) {
+      var tr = el('tr'); tr.dataset.id = r.id;
+      var c = el('td', 'c'), cb = el('input'); cb.type = 'checkbox'; cb.id = 'cb-' + r.id; cb.disabled = true;
+      cb.setAttribute('aria-label', 'Applied: ' + r.title + ' at ' + r.company);
+      cb.addEventListener('change', function () { toggle(r, cb.checked); });
+      c.appendChild(cb); tr.appendChild(c); boxes[r.id] = { cb: cb, tr: tr }; total++;
+      tr.appendChild(el('td', 'n', String(i + 1)));
+      var p = el('td'), a = el('a', null, r.title); a.href = r.url; a.target = '_blank'; a.rel = 'noopener'; p.appendChild(a);
+      if (r.why) { p.appendChild(el('br')); p.appendChild(el('span', 'why', r.why)); }
+      tr.appendChild(p);
+      tr.appendChild(el('td', null, r.company));
+      tr.appendChild(el('td', null, r.where));
+      tr.appendChild(el('td', 'd' + (r.old ? ' old' : ''), r.posted + (r.old ? ' (old)' : '')));
+      tr.appendChild(el('td', null, r.fit));
+      var rv = el('td'), ra = el('a', 'chip', r.variant); ra.href = r.resume; rv.appendChild(ra); tr.appendChild(rv);
+      if (g.through) tr.appendChild(el('td', null, r.through || ''));
+      tb.appendChild(tr);
+    });
+    t.appendChild(tb); sc.appendChild(t); sec.appendChild(sc); groups.appendChild(sec);
+  });
+
+  function paint() {
+    var n = 0;
+    Object.keys(boxes).forEach(function (id) {
+      var on = !!done[id]; if (on) n++;
+      boxes[id].cb.checked = on; boxes[id].tr.classList.toggle('done', on);
+    });
+    document.getElementById('count').textContent = n + ' of ' + total + ' applied';
+    document.getElementById('meter').style.width = (total ? (100 * n / total) : 0) + '%';
+  }
+  function setStatus(text, warn) { var s = document.getElementById('status'); s.textContent = text; s.className = 'status' + (warn ? ' warn' : ''); }
+  function enable() { Object.keys(boxes).forEach(function (id) { boxes[id].cb.disabled = false; }); }
+
+  function local() { try { return JSON.parse(localStorage.getItem('applied') || '{}'); } catch (e) { return {}; } }
+  function toggle(r, on) {
+    if (on) done[r.id] = true; else delete done[r.id];
+    paint();
+    if (!db) { try { localStorage.setItem('applied', JSON.stringify(done)); } catch (e) {} return; }
+    var ref = db.doc('applied/' + r.id);
+    var op = on ? ref.set({ url: r.url, title: r.title, company: r.company, at: new Date().toISOString() }) : ref.delete();
+    op.then(function () { setStatus('Saved'); }, function (e) {
+      if (on) delete done[r.id]; else done[r.id] = true; paint();
+      setStatus('Could not save that check (' + ((e && e.code) || 'error') + '). Try again.', true);
+    });
+  }
+
+  var rowsById = {};
+  data.groups.forEach(function (g) { g.rows.forEach(function (r) { rowsById[r.id] = r; }); });
+  function q(x) { return '"' + String(x || '').replace(/["\\$`]/g, '\\$&') + '"'; }
+  document.getElementById('copy').addEventListener('click', function () {
+    var today = new Date().toISOString().slice(0, 10);
+    var lines = Object.keys(done).filter(function (id) { return rowsById[id]; }).map(function (id) {
+      var r = rowsById[id];
+      return 'python3 -m jobhunt applied add --company ' + q(r.company) + ' --title ' + q(r.title) + ' --url ' + q(r.url) +
+        ' --resume ' + q(r.variant) + ' --when ' + today;
+    });
+    var text = lines.join('\n');
+    var ok = function () { setStatus('Copied ' + lines.length + ' command(s). Paste them to your agent or run them in the repo folder.'); };
+    if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(text).then(ok, function () { window.prompt('Copy these:', text); }); }
+    else { window.prompt('Copy these:', text); }
+  });
+
+  var hide = document.getElementById('hide');
+  try { hide.checked = localStorage.getItem('hideDone') === '1'; } catch (e) {}
+  document.body.classList.toggle('hide-done', hide.checked);
+  hide.addEventListener('change', function () {
+    document.body.classList.toggle('hide-done', hide.checked);
+    try { localStorage.setItem('hideDone', hide.checked ? '1' : '0'); } catch (e) {}
+  });
+  paint();
+
+  var use = window.claude && window.claude.use ? window.claude.use('db') : Promise.resolve(null);
+  use.then(function (d) {
+    if (!d) { done = local(); paint(); enable(); setStatus('Checks are saved in this browser only. Use the copy button to log them.', true); return; }
+    db = d;
+    d.collection('applied').onSnapshot(function (snap) {
+      done = {}; snap.docs.forEach(function (doc) { done[doc.id] = true; });
+      paint(); enable(); setStatus('Checks are saved to your account.');
+    }, function (e) { enable(); setStatus('Could not load your checks (' + ((e && e.code) || 'error') + ').', true); });
+  });
+})();
+</script>
+</body></html>
