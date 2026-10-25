@@ -145,3 +145,7 @@ python3 -m pytest tests -q
   probability.
 - Your data stays on your machine in `workspace/`. If you publish a fork, run `python3 -m jobhunt privacy-check`
   first, with your personal terms in `workspace/privacy_terms.txt`.
+
+## License
+
+MIT. See [LICENSE](LICENSE).
