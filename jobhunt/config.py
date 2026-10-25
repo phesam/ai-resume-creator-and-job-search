@@ -145,6 +145,21 @@ def candidate_brief(profile: dict) -> str:
     lines = [f"# Candidate brief: {profile.get('name') or 'the candidate'}", ""]
     if profile.get("summary"):
         lines += [profile["summary"].strip(), ""]
+    from datetime import date
+    facts = []
+    start = profile.get("fulltime_start")
+    if start:
+        start = date.fromisoformat(str(start))
+        facts.append(f"Full-time experience: about {(date.today() - start).days / 365.25:.1f} years (since {start:%b %Y}), "
+                     "plus any internships in the inventory.")
+    limit = (profile.get("eligibility") or {}).get("max_required_years")
+    if limit is not None:
+        facts.append(f"Years limit: a posting whose stated minimum is more than {limit:g} years is not eligible; record it as "
+                     "the dealbreaker when the code missed it. A missing years line is not eligibility.")
+    if profile.get("graduation"):
+        facts.append(f"Graduated: {profile['graduation']} (for new-grad windows).")
+    facts.append(f"Citizenship: {profile.get('citizenship') or 'not stated'}. Clearance: {profile.get('clearance') or 'none'}.")
+    lines += ["## Facts for eligibility", "", *[f"- {f}" for f in facts], ""]
     lines += ["## Roles to keep at the title screen", "", (profile.get("target_roles") or "").strip(), ""]
     lines += ["## Location regions (classify every location string into exactly one key)", ""]
     for r in profile.get("regions") or []:

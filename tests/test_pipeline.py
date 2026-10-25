@@ -186,7 +186,7 @@ def test_apply_list_orders_groups_and_explains_what_it_left_off(monkeypatch, wor
     md = (workspace / "APPLY_LIST.md").read_text()
     assert out["referral"] == 1 and "| Sam |" in md
     assert "Software Engineer, Platform" not in md.split("## Not on this list")[0]   # already applied
-    assert "1 roles you already applied to" in md
+    assert "1 role you already applied to" in md
     assert ("Otherco", "Platform Engineer") in cands
-    assert "1 roles that ask for more than 2 years" in md                 # 3+ years asked, above the new limit of 2
+    assert "1 role asking for more than 2 years" in md                 # 3+ years asked, above the new limit of 2
     assert (workspace / "apply_list.html").read_text().count("Frontend Engineer") >= 1

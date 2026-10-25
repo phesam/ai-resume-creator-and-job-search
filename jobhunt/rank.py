@@ -39,7 +39,7 @@ def experience_multiplier(sig: dict, cand: float, text: str = "") -> tuple[float
         base = {"entry": 1.0, "any": 0.95, "mid": 0.85, "unspecified": 0.8, "senior": 0.25, "senior+": 0.1}.get(sig["level"], 0.75)
         return base, f"no years stated; title level '{sig['level']}'"
     if highs and max(highs) <= 2 and cand > max(highs) + 0.25:
-        return 0.6, f"asks {req:g}-{max(highs):g} yrs; at {cand:g} yrs you may be past the early-career window"
+        return 0.6, f"asks {req:g}-{max(highs):g} yrs; at {cand:.1f} yrs you may be past the early-career window"
     strict = bool(NON_INTERN_RX.search(text))
     if req <= max(1.0, cand):
         mult = 1.0
@@ -52,7 +52,7 @@ def experience_multiplier(sig: dict, cand: float, text: str = "") -> tuple[float
     else:
         mult = 0.05
     gap = req - cand
-    label = f"asks {req:g}+ yrs; you have {cand:g}" + (" (non-internship wording)" if strict and req > cand else "")
+    label = f"asks {req:g}+ yrs; you have {cand:.1f}" + (" (non-internship wording)" if strict and req > cand else "")
     if gap > 0:
         label += " — stretch" if mult < 0.75 else " — small gap"
     return mult, label

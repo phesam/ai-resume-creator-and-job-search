@@ -64,7 +64,8 @@ company with no special hook; −1 popular role type; 0 typical; +1 niche requir
 U.S.-person/clearance-eligible restriction they meet that shrinks the pool; +2 a rare combination they match.
 
 **dealbreaker (string or null):** hard blockers you can quote from the posting that the code missed: an active
-clearance required, a required degree they lack, PhD required, years required above their limit written in words,
+clearance required, a required degree they lack, PhD required, years required above their limit (BRIEF.md, "Years
+limit") however it is written,
 a graduation window they miss, required on-site location abroad, a required license or certification, current
 student status. Travel or field work is a gap, not a dealbreaker.
 
@@ -73,6 +74,8 @@ satellites, hardware or factories), `forward_deployed` (customer-facing engineer
 `systems_engineering`, `test` (main output is tests or verification of someone else's product), `analyst`,
 `operations` (field, shift, support work where coding is incidental), or `other`. Classify by what the person does
 day to day, not by the team's name. Building a product, platform, tool or infrastructure others use is `software`.
+Customer-facing technical roles where coding is incidental (solutions architect, sales engineer, technical account
+manager) are `other`; if they mainly write code for customers, `forward_deployed`.
 
 **career_value (0–5): how much the role grows their career and opens doors for the next job** (brand, learning,
 transferable skills, real ownership). 5 = high-signal role at a strong brand; 4 = strong but specialized; 3 = solid

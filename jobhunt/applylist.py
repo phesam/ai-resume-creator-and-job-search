@@ -37,6 +37,10 @@ TEMPLATE = Path(__file__).with_name("applylist_template.html")
 FIT_WORD = {5: "Great", 4: "Good", 3: "Partial", 2: "Stretch", 1: "Stretch", 0: "Stretch"}
 
 
+def _n(count: int, word: str, plural: str | None = None) -> str:
+    return f"{count} {word if count == 1 else (plural or word + 's')}"
+
+
 # ----------------------------------------------------------------------------- inputs
 def load_picks() -> list[dict]:
     p = paths.picks()
@@ -278,7 +282,7 @@ def build(profile: dict | None = None, rerank: bool = True) -> dict:
         f"age is not part of the order; postings older than {old_days} days are marked (old). Fresh postings still "
         "matter: send new ones within a week.",
         f"- **Fit:** how much of the job's daily work you have already done, out of 5, then the years the posting asks "
-        f"for. You have {years:g} years full time. Postings asking more than {max_years:g} years are left off.",
+        f"for. You have {years:.1f} years full time. Postings asking more than {max_years:g} years are left off.",
         "- **Resume:** which variant to send; each links to the PDF.",
         "- **Checkboxes:** open apply_list.html to tick roles off as you send them.", "",
     ]
@@ -296,9 +300,9 @@ def build(profile: dict | None = None, rerank: bool = True) -> dict:
     md += [f"## Everywhere else ({len(other)})", "", "Remote roles are here too.", "", *_table(other, today, old_days), ""]
     notes = []
     if left["duplicates"]:
-        notes.append(f"{left['duplicates']} roles you already applied to (same posting, or the same title at that company).")
+        notes.append(f"{_n(left['duplicates'], 'role')} you already applied to (same posting, or the same title at that company).")
     if too_senior:
-        notes.append(f"{len(too_senior)} roles that ask for more than {max_years:g} years of experience.")
+        notes.append(f"{_n(len(too_senior), 'role')} asking for more than {max_years:g} years of experience.")
     if cut:
         notes.append(f"Anything past a company's best {cap} (minus what you sent there in the last "
                      f"{cfg.get('recent_applications_days', 90)} days): "
@@ -306,11 +310,11 @@ def build(profile: dict | None = None, rerank: bool = True) -> dict:
                      + ". They are in that company's report.")
     for c, n in left["company_rules"].items():
         rule = _rule_for(c, profile) or {}
-        notes.append(f"{n} {c} roles outside your rule for that company" + (f" ({rule['note']})" if rule.get("note") else "") + ".")
+        notes.append(f"{_n(n, c + ' role')} outside your rule for that company" + (f" ({rule['note']})" if rule.get("note") else "") + ".")
     if left["long_shots"]:
-        notes.append(f"{left['long_shots']} long shots (tier D); see each run's REPORT.md.")
+        notes.append(f"{_n(left['long_shots'], 'long shot')} (tier D); see each run's REPORT.md.")
     if left["not_recommended"]:
-        notes.append(f"{left['not_recommended']} roles the reviewer ruled out after reading the posting; see each run's REPORT.md.")
+        notes.append(f"{_n(left['not_recommended'], 'role')} the reviewer ruled out after reading the posting; see each run's REPORT.md.")
     md += ["## Not on this list", "", *[f"- {n}" for n in notes or ["Nothing was left off."]], ""]
     out_md = paths.workspace() / "APPLY_LIST.md"
     out_md.parent.mkdir(parents=True, exist_ok=True)
