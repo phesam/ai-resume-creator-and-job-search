@@ -1,0 +1,11 @@
+# Your personal files: inventory, profile, resume, application history, runs, caches, built PDFs.
+# Keep them out of git. If your fork is private and you want them versioned, remove this line knowingly.
+workspace/
+
+__pycache__/
+*.pyc
+.pytest_cache/
+.DS_Store
+*.overflow.pdf
+.venv/
+venv/
