@@ -125,13 +125,12 @@ The full rule set these became is the [resume playbook](RESUME_PLAYBOOK.md).
 | Period | Applications | Human interviews | Automated tests |
 |---|---|---|---|
 | About 14 months with versions 1 and 2 | ~180 at ~90 companies | 1 (the version 1 callback, to a final round) | 4 |
-| Two weeks with version 3 and this search | ~50 | 3 recruiter screens, all from applications sent the same day, all within 10 days | 0 |
-
-Also in those two weeks: a fourth recruiter call for an application sent earlier.
+| Two weeks with version 3 and this search | ~50 | 4 companies interviewing: 3 from applications sent the same day (each called within 10 days), 1 from an application sent a few weeks earlier | 0 |
 
 **How much does this prove? Less than it looks like, and more than nothing.**
-- The samples are small. At a true rate of 3% per application (roughly the cold-application average in Ashby's
-  data), three or more screens in fifty applications happens about 19% of the time by chance. At the old rate of
+- The samples are small. Counting only the three interviews from the ~50 new applications: at a true rate of 3% per
+  application (roughly the cold-application average in Ashby's data), three or more interviews in fifty applications
+  happens about 19% of the time by chance. At the old rate of
   about 0.6% (1 in 180), it would happen less than 1% of the time.
 - The resume, the targeting (early-career and level-I roles that matched the daily work, in the region they wanted)
   and the timing (fresh postings) all changed at once. There is no way to say how much each contributed.

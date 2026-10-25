@@ -66,12 +66,34 @@ patients and scheduling for clinic staff.
 
 ---
 
+## Pacific State University, Autonomy Lab — Research Assistant (Sep 2023 – May 2024)
+
+- The lab runs a small delivery robot around campus for mapping research.
+- Why: researchers re-drove routes whenever they needed new data, because runs weren't recorded in a replayable form.
+- What Jordan did: built a ROS 2 logging pipeline in Python that records the robot's camera, lidar and GPS streams;
+  300+ hours of runs were recorded and labeled with it (lab dataset index).
+- Also wrote a C++ ROS 2 node that flags dropped sensor frames while the robot runs; while testing it, found that a
+  clock-sync bug had misaligned timestamps in 12% of earlier recorded runs (lab audit), and fixed it.
+- The lab's mapping paper used the cleaned dataset. Jordan is acknowledged, not an author.
+- Do not claim: co-author; designed the robot.
+
+---
+
 ## Cartwheel Payments — Software Engineer Intern (Jun 2023 – Aug 2023)
 
 - Built an internal Python tool that matches failed merchant payouts to bank error codes.
 - Why: support agents answered "where's my payout?" tickets by reading raw bank files; it took hours per ticket.
 - Result: the support team used it daily; answers took minutes instead of hours (support lead's estimate; no
   dashboard).
+
+---
+
+## Lumen Learning Labs — Software Engineer Intern (Jun 2022 – Aug 2022)
+
+- Lumen makes a study app for college students; the web app is built from a shared React component library.
+- Why: a district customer required a WCAG AA accessibility audit, and the app failed its first check.
+- What Jordan did: added automated accessibility checks (axe) to the component library's CI, then fixed what they
+  found; the checks caught 140+ contrast and labeling bugs before release (CI history), and the app passed the audit.
 
 ---
 
@@ -92,8 +114,8 @@ patients and scheduling for clinic staff.
 
 ## Skills
 
-- Used for real: TypeScript, JavaScript, React, React Native, Node.js, GraphQL, PostgreSQL, Python, Kubernetes,
-  Docker, Grafana, CI/CD, Git, Rust (one merged contribution).
+- Used for real: TypeScript, JavaScript, React, React Native, Node.js, GraphQL, PostgreSQL, Python, C++ (lab),
+  ROS 2 (lab), Kubernetes, Docker, Grafana, CI/CD, Git, Rust (one merged contribution).
 - Coursework only: C, Java.
 - Do not list: AWS (the company runs its own platform), Go.
 

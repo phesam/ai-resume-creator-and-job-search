@@ -24,7 +24,7 @@ It was built for one early-career software engineer and then generalized. Their 
 | | Applications | Human interviews |
 |---|---|---|
 | Before: AI-tailored resumes per posting, applying from job boards | ~180 over ~14 months | 1 |
-| After: this resume and this search | ~50 over two weeks | 3 recruiter screens |
+| After: this resume and this search | ~50 over two weeks | 4 companies interviewing |
 
 Small samples, and several things changed at once, so read the case study's caveats. What the research does support
 ([evidence](docs/EVIDENCE.md)):

@@ -52,12 +52,25 @@ experience:
       - text: "Built an end-to-end AI agent workflow that turns design mockups into form schemas, field docs and API types; adopted by three product teams as the standard way to add a booking form"
       - text: "Took both booking services to production on the company's **Kubernetes** platform: gateway routes, Grafana dashboards, logs and alerts, plus runbooks so any on-call engineer can fix an outage"
       - text: "Fixed a time-zone bug that showed patients appointment slots that no longer existed, adding regression tests for daylight-saving changes; double-booking support tickets dropped from ~40 a week to 2"
+  - id: robotics_lab
+    title: "Research Assistant, Autonomy Lab"
+    org: "Pacific State University"
+    dates: "Sep 2023 – May 2024"
+    bullets:
+      - text: "Built a ROS 2 logging pipeline in **Python** that records a campus delivery robot's camera, lidar and GPS streams, so the lab could replay and label 300+ hours of runs instead of re-driving routes"
+      - text: "Wrote a **C++** node that flags dropped sensor frames live; found and fixed a timestamp bug that had corrupted 12% of recorded runs, and the lab's mapping paper used the cleaned data"
   - id: cartwheel
     title: "Software Engineer Intern"
     org: "Cartwheel Payments"
     dates: "Jun 2023 – Aug 2023"
     bullets:
-      - text: "Built an internal **Python** tool that matches failed merchant payouts to bank error codes; the support team used it daily to answer payout tickets in minutes instead of hours"
+      - text: "Built an internal Python tool that matches failed merchant payouts to bank error codes; the support team used it daily to answer payout tickets in minutes instead of hours"
+  - id: lumen
+    title: "Software Engineer Intern"
+    org: "Lumen Learning Labs"
+    dates: "Jun 2022 – Aug 2022"
+    bullets:
+      - text: "Added automated accessibility checks to the shared React component library's CI, catching 140+ contrast and labeling bugs before release so the student app passed its WCAG AA audit"
 
 projects:
   - id: trailmix
@@ -81,8 +94,8 @@ education:
     detail: "B.S. Computer Science · GPA 3.6/4.0"
 
 skills:
-  Languages: "TypeScript, JavaScript, Python, Rust, SQL"
-  Tools: "React, React Native, Node.js, GraphQL, PostgreSQL, Kubernetes, Docker, Grafana, CI/CD, Git"
+  Languages: "TypeScript, JavaScript, Python, C++, Rust, SQL"
+  Tools: "React, React Native, Node.js, GraphQL, PostgreSQL, Kubernetes, Docker, Grafana, ROS 2, CI/CD, Git"
 
 variants:
   general:
