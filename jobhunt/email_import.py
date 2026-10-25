@@ -52,7 +52,10 @@ def load_events(folder: Path, skip_prefix: str | None = None) -> list[dict]:
 
 
 def _days(a: str, b: str) -> int:
-    return abs((date.fromisoformat(a) - date.fromisoformat(b)).days)
+    """Days between two dates; 'YYYY-MM' counts as the 1st. Unreadable dates are far apart (never paired)."""
+    from .config import month_date
+    da, db = month_date(a), month_date(b)
+    return abs((da - db).days) if da and db else 10_000
 
 
 def _title(e: dict) -> str:

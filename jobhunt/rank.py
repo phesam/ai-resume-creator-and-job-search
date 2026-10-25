@@ -15,9 +15,8 @@ EVERGREEN_RX = re.compile(r"early career|new grad|new graduate|university|talent
 
 
 def candidate_yoe(profile: dict) -> float:
-    start = profile.get("fulltime_start")
-    if isinstance(start, str):
-        start = date.fromisoformat(start)
+    from .config import month_date
+    start = month_date(profile.get("fulltime_start"))
     if not start:
         return 0.0
     return round((date.today() - start).days / 365.25, 2)
@@ -311,6 +310,32 @@ def applications_past_year(company: str, today: date | None = None) -> int:
 LEVEL_FIT_MULT = {5: 1.0, 4: 0.85, 3: 0.6, 2: 0.35, 1: 0.15, 0: 0.05}
 
 
+def _num(value, default=None):
+    """A reviewer score as a number: 4, 4.0 and "4" all count; null, "" or "n/a" give the default."""
+    if isinstance(value, bool):
+        return default
+    if isinstance(value, (int, float)):
+        return float(value)
+    try:
+        return float(str(value).strip())
+    except (TypeError, ValueError):
+        return default
+
+
+def clean_fit(fit: dict | None) -> dict | None:
+    """Reviewer rows come from a model: make every score a number (or absent) so one odd value can't stop a ranking."""
+    if not fit:
+        return fit
+    out = dict(fit)
+    for k in ("work_match", "skills", "domain", "level_fit", "competition", "career_value"):
+        v = _num(out.get(k))
+        if v is None:
+            out.pop(k, None)
+        else:
+            out[k] = v
+    return out
+
+
 def _step(table: dict, value: float) -> float:
     table = {int(k): float(v) for k, v in table.items()}
     return table[max(0, min(5, int(round(value))))]
@@ -318,6 +343,7 @@ def _step(table: dict, value: float) -> float:
 
 def score_job(job: dict, fit: dict | None, profile: dict, cand: float, baseline: float | None = None,
               prior_apps: int = 0) -> dict:
+    fit = clean_fit(fit)
     sig = job["signals"]
     notes = {}
     e_mult, notes["experience"] = experience_multiplier(sig, cand, job.get("description") or "")
@@ -427,13 +453,18 @@ def score_job(job: dict, fit: dict | None, profile: dict, cand: float, baseline:
 
 
 def load_fits(run_dir: Path) -> dict:
-    """Reviewer rows by key (unique within a run) and by (company, id) through the run's candidates."""
+    """Reviewer rows by (key, id). Files are read oldest first, so a newer review of the same posting wins (a re-run
+    of a folder renumbers keys; the id check stops an old review landing on a different posting)."""
     fits = {}
-    for p in sorted((run_dir / "fit").glob("*.json")):
-        data = json.loads(p.read_text())
+    files = sorted((run_dir / "fit").glob("*.json"), key=lambda p: (p.stat().st_mtime, p.name))
+    for p in files:
+        try:
+            data = json.loads(p.read_text())
+        except ValueError:
+            continue  # a half-written file from a stalled reviewer; re-run that batch
         for row in data if isinstance(data, list) else data.get("jobs", []):
             if isinstance(row, dict) and row.get("key"):
-                fits.setdefault(f"key:{row['key']}", row)
+                fits[f"{row['key']}|{row.get('id')}"] = row
     return fits
 
 
@@ -450,13 +481,11 @@ def rank_run(run_dir: Path, profile: dict) -> list[dict]:
     from .triage import dup_key
     by_dup = {}
     for j in candidates:
-        f = fits.get(f"key:{j.get('key')}")
-        if f and str(f.get("id")) == str(j["id"]):
+        f = fits.get(f"{j.get('key')}|{j['id']}")
+        if f:
             by_dup.setdefault(dup_key(j), f)
     for j in candidates:
-        fit = fits.get(f"key:{j.get('key')}")
-        if fit and str(fit.get("id")) != str(j["id"]):
-            fit = None  # a key from an older numbering: never pin one posting's review on another
+        fit = fits.get(f"{j.get('key')}|{j['id']}")
         if not fit:
             fit = by_dup.get(dup_key(j))  # identical posting elsewhere was reviewed
         j["fit"] = fit

@@ -78,17 +78,30 @@ def save(rows: list[dict]) -> None:
 
 def add(company: str, title: str, *, job_id: str = "", url: str = "", location: str = "", status: str = "applied",
         source: str = "manual", resume: str = "", notes: str = "", when: str | None = None) -> dict:
+    """Log an application, or update one already on record.
+
+    The same posting (job id or URL at the same company) is updated, never duplicated. An outcome (rejected,
+    interview, offer...) without an id or URL updates the latest application with the same title. An update keeps the
+    original application date and records the outcome's date in status_date."""
     rows = load()
-    row = {
-        "date_applied": when or date.today().isoformat(),
-        "company": company, "title": title, "job_id": job_id, "url": url, "location": location,
-        "status": status, "status_date": "", "source": source, "resume": resume, "notes": notes,
-    }
-    for r in rows:  # update instead of duplicating
-        if job_id and r.get("job_id") == job_id and same_company(r.get("company"), company):
-            r.update({k: v for k, v in row.items() if v})
-            save(rows)
-            return r
+    day = when or date.today().isoformat()
+    mine = [r for r in rows if same_company(r.get("company"), company)]
+    hit = next((r for r in reversed(mine) if (job_id and r.get("job_id") == job_id) or (url and r.get("url") == url)), None)
+    if hit is None and status != "applied" and not job_id and not url:
+        hit = next((r for r in reversed(mine) if same_title(r.get("title"), title)), None)
+    if hit is not None:
+        for k, v in (("title", title), ("job_id", job_id), ("url", url), ("location", location), ("resume", resume)):
+            if v and not hit.get(k):
+                hit[k] = v
+        if status != (hit.get("status") or "applied"):
+            hit["status"], hit["status_date"] = status, day
+        if notes:
+            hit["notes"] = "; ".join(x for x in (hit.get("notes"), notes) if x)
+        save(rows)
+        return hit
+    row = {"date_applied": day, "company": company, "title": title, "job_id": job_id, "url": url, "location": location,
+           "status": status, "status_date": day if status != "applied" else "", "source": source, "resume": resume,
+           "notes": notes}
     rows.append(row)
     save(rows)
     return row

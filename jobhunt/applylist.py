@@ -123,10 +123,17 @@ def _history(applied: str | None) -> str:
 
 def rows(profile: dict, rerank: bool = True) -> tuple[list[dict], dict]:
     """Every listable role, plus counts of what was left off and why."""
-    left = {"duplicates": 0, "long_shots": 0, "company_rules": {}, "not_recommended": 0}
+    left = {"duplicates": 0, "long_shots": 0, "company_rules": {}, "not_recommended": 0, "bad_picks": []}
     history = tracker.load()
-    picks = load_picks()
-    covered: set[str] = set()
+    picks = []
+    for p in load_picks():
+        if not isinstance(p, dict) or not p.get("company") or not (p.get("job_id") or p.get("url")):
+            left["bad_picks"].append(str((p or {}).get("title") or (p or {}).get("url") or p)[:60])
+        else:
+            picks.append(p)
+    # A newer run holds the current postings for what it covered: a company run covers the whole company, a sweep
+    # only the regions it kept. Older runs still supply that company's roles elsewhere.
+    covered: dict[str, set | None] = {}
     out, seen = [], set()
     stem = pdf_name(yaml.safe_load(paths.resume_yaml().read_text()) if paths.resume_yaml().exists() else {})
     referrals = {r["company"]: r.get("contact") or "your contact" for r in profile.get("referrals") or []
@@ -138,9 +145,13 @@ def rows(profile: dict, rerank: bool = True) -> tuple[list[dict], dict]:
         if not (run_dir / "ranked.json").exists():
             continue  # not reviewed yet: its company stays uncovered, so an older ranked run still counts
         run_cos = meta.get("companies") or [meta.get("company")]
+        run_regions = set(meta["regions"]) if meta.get("kind") == "sweep" and meta.get("regions") else None
         for j in json.loads((run_dir / "ranked.json").read_text()):
-            if any(tracker.same_company(j["company"], c) for c in covered):
-                continue  # a newer run holds this company: its postings there are the current ones
+            cov = next((v for c, v in covered.items() if tracker.same_company(c, j["company"])), "absent")
+            if cov != "absent" and (cov is None or (j["rank"]["notes"].get("location") or "unknown") in cov):
+                continue  # a newer run holds the current postings for this company (in this region)
+            if any(r["url"] == j["url"] for r in out):
+                continue
             fit, r = j.get("fit") or {}, j["rank"]
             pick = next((p for p in picks if tracker.same_company(p.get("company", ""), j["company"])
                          and str(p.get("job_id")) in [str(j["id"])] + [str(d["id"]) for d in j.get("duplicates") or []]), None)
@@ -178,9 +189,15 @@ def rows(profile: dict, rerank: bool = True) -> tuple[list[dict], dict]:
                         "history": _history(applied), "through": referrals.get(next(
                             (c for c in referrals if tracker.same_company(c, j["company"])), ""), ""),
                         "note": (pick or {}).get("note") or ""})
-        covered |= {c for c in run_cos if c}
+        for c in (c for c in run_cos if c):
+            if run_regions is None:
+                covered[c] = None
+            elif covered.get(c, set()) is not None:
+                covered[c] = covered.get(c, set()) | run_regions
     for p in picks:  # tracked roles with a hand score and no run behind them
         if p.get("work") is None or not p.get("url") or any(r["url"] == p["url"] for r in out):
+            if p.get("work") is not None and not p.get("url"):
+                left["bad_picks"].append(str(p.get("title") or p.get("job_id"))[:60])
             continue
         if any(tracker.same_company(h.get("company"), p.get("company")) and str(h.get("job_id") or "") == str(p.get("job_id"))
                for h in history if h.get("job_id")):
@@ -315,6 +332,9 @@ def build(profile: dict | None = None, rerank: bool = True) -> dict:
         notes.append(f"{_n(left['long_shots'], 'long shot')} (tier D); see each run's REPORT.md.")
     if left["not_recommended"]:
         notes.append(f"{_n(left['not_recommended'], 'role')} the reviewer ruled out after reading the posting; see each run's REPORT.md.")
+    if left["bad_picks"]:
+        notes.append(f"{_n(len(left['bad_picks']), 'entry', 'entries')} in picks.yaml missing a company, url or job_id "
+                     f"(fix them to list them): {', '.join(left['bad_picks'][:5])}.")
     md += ["## Not on this list", "", *[f"- {n}" for n in notes or ["Nothing was left off."]], ""]
     out_md = paths.workspace() / "APPLY_LIST.md"
     out_md.parent.mkdir(parents=True, exist_ok=True)
@@ -337,7 +357,7 @@ def build(profile: dict | None = None, rerank: bool = True) -> dict:
             "local": len(local), "elsewhere": len(other), "total": len(referral) + len(blocked) + len(local) + len(other),
             "left_off": {"duplicates": left["duplicates"], "too_many_years": len(too_senior), "company_cap": cut,
                          "company_rules": left["company_rules"], "long_shots": left["long_shots"],
-                         "not_recommended": left["not_recommended"]}}
+                         "not_recommended": left["not_recommended"], "bad_picks": left["bad_picks"]}}
 
 
 if __name__ == "__main__":

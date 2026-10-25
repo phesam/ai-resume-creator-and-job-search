@@ -257,6 +257,8 @@ def measure(pdf_path: Path) -> dict:
 
 # ----------------------------------------------------------------------------- lint
 BAD_CHARS = {
+    "\u202f": "narrow no-break space", "\u2009": "thin space", "\u2007": "figure space", "\u2060": "word joiner",
+    "\ufeff": "byte-order mark",
     "‑": "non-breaking hyphen", " ": "no-break space", "ﬁ": "fi ligature", "ﬂ": "fl ligature",
     "​": "zero-width space", "‐": "unicode hyphen", "−": "minus sign", "­": "soft hyphen",
     "→": "arrow", "●": "black circle bullet", "•": "bullet char in text",

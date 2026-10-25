@@ -100,6 +100,23 @@ def normalize(raw: dict | None) -> dict:
     return p
 
 
+def month_date(value) -> "date | None":
+    """A date from YAML that may be a date, 'YYYY-MM-DD' or 'YYYY-MM' (taken as the 1st). None when empty or unreadable."""
+    import re as _re
+    from datetime import date
+    if value in (None, ""):
+        return None
+    if isinstance(value, date):
+        return value
+    m = _re.fullmatch(r"\s*(\d{4})-(\d{1,2})(?:-(\d{1,2}))?\s*", str(value))
+    if not m:
+        return None
+    try:
+        return date(int(m[1]), int(m[2]), int(m[3] or 1))
+    except ValueError:
+        return None
+
+
 def region_labels(profile: dict) -> dict:
     labels = {r["key"]: r["label"] for r in profile.get("regions") or []}
     labels.update({"remote_us": "Remote (US)", "other_us": "Elsewhere in the US", "unknown": "Location unclear",
@@ -147,9 +164,8 @@ def candidate_brief(profile: dict) -> str:
         lines += [profile["summary"].strip(), ""]
     from datetime import date
     facts = []
-    start = profile.get("fulltime_start")
+    start = month_date(profile.get("fulltime_start"))
     if start:
-        start = date.fromisoformat(str(start))
         facts.append(f"Full-time experience: about {(date.today() - start).days / 365.25:.1f} years (since {start:%b %Y}), "
                      "plus any internships in the inventory.")
     limit = (profile.get("eligibility") or {}).get("max_required_years")

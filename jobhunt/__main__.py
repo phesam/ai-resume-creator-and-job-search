@@ -37,6 +37,28 @@ from .config import load_profile, region_keys
 
 
 # ----------------------------------------------------------------------------- init / doctor
+def unfilled(profile: dict | None = None) -> list[str]:
+    """What still holds template content. Searching with the template profile would score you as someone else."""
+    import yaml
+    todo = []
+    profile = profile or load_profile()
+    if not paths.profile().exists() or (profile.get("name") or "").strip() in ("", "Your Name"):
+        todo.append("profile.yaml is still the template (say \"set me up\" to fill it in)")
+    inv = paths.inventory()
+    if not inv.exists() or "<Employer>" in inv.read_text() and inv.read_text().count("## ") < 8:
+        todo.append("inventory.md has no entries yet (say \"interview me\")")
+    res = paths.resume_yaml()
+    if not res.exists() or ((yaml.safe_load(res.read_text()) or {}).get("header") or {}).get("name") == "Jordan Lee":
+        todo.append("resume.yaml is still the fictional example (say \"write my resume\")")
+    return todo
+
+
+def _warn_if_unfilled() -> None:
+    for t in unfilled():
+        if t.startswith("profile") or t.startswith("inventory"):
+            print(f"WARNING: {t}. Results will not reflect you.", file=sys.stderr)
+
+
 WORKSPACE_FILES = ["inventory.md", "profile.yaml", "resume.yaml", "decisions.md", "watchlist.yaml", "picks.yaml"]
 
 
@@ -92,6 +114,8 @@ def cmd_doctor(a) -> int:
     checks.append((f"tests: {last}", t.returncode == 0))
     for name, ok in checks:
         print(("OK   " if ok else "FAIL ") + name)
+    for t in unfilled():
+        print("TODO " + t)
     return 0 if all(ok for _, ok in checks) else 1
 
 
@@ -177,6 +201,7 @@ def _had_run(company: str, exclude: Path) -> bool:
 # ----------------------------------------------------------------------------- stage 1: find / sweep
 def cmd_find(a) -> int:
     """Stage 1 for one company: fetch everything, apply universal checks, prepare the AI screen."""
+    _warn_if_unfilled()
     profile = load_profile()
     cfgs = [_cfg_from_args(a)] if getattr(a, "ats", None) else resolve.lookup(a.company)
     if not cfgs:
@@ -226,6 +251,7 @@ def _select_sweep_companies(a) -> list[tuple[str, list[dict]]]:
 def cmd_sweep(a) -> int:
     """Stage 1 across many companies: fetch in parallel, keep postings in the regions asked for, universal checks,
     prepare the AI screen. Same next steps as `find`."""
+    _warn_if_unfilled()
     profile = load_profile()
     valid = set(region_keys(profile))
     regions = [r.strip() for r in (a.regions or "").split(",") if r.strip()] or \
@@ -418,8 +444,9 @@ def finish_run(run_dir: Path, profile: dict) -> int:
         summary["new_candidates_since_last_run"] = len(meta["new_since_last_run"])
     print(json.dumps(summary, indent=1))
     if packets:
-        print(f"\nNEXT: one reviewer per two or three files in {run_dir}/review/ writes fit/<same name>.json following "
-              f"jobhunt/rubrics/REVIEW_RUBRIC.md and workspace/inventory.md. Then:\n  python3 -m jobhunt rank {run_dir}", file=sys.stderr)
+        print(f"\nNEXT: one reviewer per two or three files in {run_dir}/review/ writes {run_dir}/fit/<same name>.json. "
+              f"Reviewers read {paths.rubrics() / 'REVIEW_RUBRIC.md'}, {paths.inventory()} and {run_dir / 'screen' / 'BRIEF.md'}. "
+              f"Then:\n  python3 -m jobhunt rank {run_dir}", file=sys.stderr)
     print(f"\nRun folder: {run_dir}", file=sys.stderr)
     return 0
 
@@ -595,6 +622,9 @@ def cmd_applied(a) -> int:
     if a.action == "add":
         if not a.company or not a.title:
             print("applied add needs --company and --title", file=sys.stderr)
+            return 2
+        if a.when and not re.fullmatch(r"\d{4}-\d{2}(?:-\d{2})?", a.when):
+            print("--when must be YYYY-MM-DD (or YYYY-MM)", file=sys.stderr)
             return 2
         row = tracker.add(a.company, a.title, job_id=a.job_id or "", url=a.url or "", location=a.location or "",
                           status=a.status, source=a.source, resume=a.resume or "", notes=a.notes or "", when=a.when)

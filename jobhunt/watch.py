@@ -35,7 +35,8 @@ def watchlist() -> list[str]:
 def _fetch(name: str) -> tuple[str, list[dict], list[str]]:
     cfgs = resolve.lookup(name)
     if not cfgs:
-        raise LookupError(f"{name} is not in data/companies.yaml; resolve it once with `python3 -m jobhunt find \"{name}\"`")
+        raise LookupError(f"{name} is not in data/companies.yaml. Find its board with `python3 -m jobhunt resolve \"{name}\"` "
+                          f"(or `detect <careers-url>`), then add it with `python3 -m jobhunt register`.")
     company = cfgs[0]["name"]
     jobs, errors, keys = [], [], set()
     for cfg in cfgs:
