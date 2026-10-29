@@ -125,7 +125,7 @@ The full rule set these became is the [resume playbook](RESUME_PLAYBOOK.md).
 | Period | Applications | Human interviews | Automated tests |
 |---|---|---|---|
 | About 14 months with versions 1 and 2 | ~180 at ~90 companies | 1 (the version 1 callback, to a final round) | 4 |
-| Two weeks with version 3 and this search | ~50 | 4 companies interviewing: 3 from applications sent the same day (each called within 10 days), 1 from an application sent a few weeks earlier | 0 |
+| Two weeks with version 3 and this search | ~50 | 5 companies interviewing, 3 of them from applications sent the same day (each called within 10 days) | 0 |
 
 **How much does this prove? Less than it looks like, and more than nothing.**
 - The samples are small. Counting only the three interviews from the ~50 new applications: at a true rate of 3% per
