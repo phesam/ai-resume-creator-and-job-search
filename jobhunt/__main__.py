@@ -15,6 +15,7 @@ Run from the repository root. Your files live in workspace/ (or $JOBHUNT_WORKSPA
   python3 -m jobhunt applied add --company X --title "..." --url ...    # log an application
   python3 -m jobhunt applied import-email           # rebuild history from workspace/email_import/*.jsonl
   python3 -m jobhunt resolve "Company" | detect <careers-url> | register --name X --ats greenhouse --token x
+  python3 -m jobhunt gather                         # (with your consent) list old resumes, local repos, GitHub activity
   python3 -m jobhunt privacy-check                  # scan the repo for your personal terms before committing
 """
 
@@ -639,6 +640,11 @@ def cmd_applied(a) -> int:
     return 0
 
 
+def cmd_gather(a) -> int:
+    from .gather import run
+    return run(a)
+
+
 def cmd_privacy(a) -> int:
     from .privacy import run
     return run(a.terms)
@@ -735,6 +741,19 @@ def main(argv=None) -> int:
     ap.add_argument("--notes")
     ap.add_argument("--when")
     ap.set_defaults(fn=cmd_applied)
+
+    ga = sub.add_parser("gather", help="with your consent: find old resumes, reviews, local repos and GitHub activity")
+    ga.add_argument("action", nargs="?", choices=["scan", "text"], default="scan",
+                    help="scan (default): list sources by name and metadata; text <file>: print one document's text")
+    ga.add_argument("target", nargs="?", help="the file for `text`")
+    ga.add_argument("--roots", help="comma-separated folders to scan (default: Desktop, Documents, Downloads, code folders, cloud drives)")
+    ga.add_argument("--exclude", help="comma-separated folders never to enter")
+    ga.add_argument("--depth", type=int, default=5)
+    ga.add_argument("--email", help="extra commit emails that are yours (work or school addresses), comma-separated")
+    ga.add_argument("--no-files", action="store_true")
+    ga.add_argument("--no-repos", action="store_true")
+    ga.add_argument("--no-github", action="store_true")
+    ga.set_defaults(fn=cmd_gather)
 
     pc = sub.add_parser("privacy-check", help="scan tracked repo files for your personal terms (workspace/privacy_terms.txt)")
     pc.add_argument("--terms", help="file of terms, one per line (default workspace/privacy_terms.txt)")

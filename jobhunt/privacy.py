@@ -24,6 +24,7 @@ EMAIL = re.compile(r"[\w.+-]+@[\w-]+\.[\w.]+")
 PHONE = re.compile(r"\(?\b\d{3}\)?[-. ]\d{3}[-. ]\d{4}\b")
 ALLOWED_EMAILS = {"noreply@anthropic.com", "jordan.lee@example.com", "you@example.com"}
 ALLOWED_PHONES = {"(555) 010-0199", "555-010-0199"}
+EXAMPLE_DOMAIN = re.compile(r"@(?:[\w-]+\.)*example\.(?:com|org|net|edu)$", re.I)  # reserved for documentation
 SKIP_SUFFIXES = {".pdf", ".png", ".jpg", ".jpeg", ".gif", ".webp", ".ico", ".woff", ".woff2"}
 
 
@@ -60,7 +61,7 @@ def scan(terms: list[str], files: list[Path] | None = None) -> list[str]:
                 if r.search(line):
                     hits.append(f"{rel}:{n}: term '{t}'")
             for m in EMAIL.findall(line):
-                if m.lower() not in ALLOWED_EMAILS and not m.lower().endswith(("@example.com", "@example.org")) \
+                if m.lower() not in ALLOWED_EMAILS and not EXAMPLE_DOMAIN.search(m) \
                         and not re.search(r"\.(png|jpg|svg|js|py|md)$", m):
                     hits.append(f"{rel}:{n}: email-like '{m}'")
             for m in PHONE.findall(line):
