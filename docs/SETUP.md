@@ -14,6 +14,7 @@ If a step fails, [TROUBLESHOOTING.md](TROUBLESHOOTING.md) has the fixes.
 | **git** | Downloads this repository and updates it | Yes (or download the ZIP) |
 | An internet connection | Fetches postings from employers' hiring systems | Yes |
 | Read-only access to your email (Gmail) | Rebuilds your application history so you never apply twice | Optional |
+| The GitHub CLI (`gh`), signed in | Lets the agent read your repositories and pull requests | Optional |
 
 Built for software engineers job hunting in the United States. Tested on macOS and Linux; on Windows, use WSL
 (step 1c).
@@ -108,7 +109,11 @@ python3 -m jobhunt doctor
 
 ## 6. Gather what you'll be asked for
 
-Having these at hand makes the first session much faster:
+With your permission, the agent can find most of this itself: right after setup it offers to search Desktop,
+Documents, Downloads and your code folders for old resumes, CVs, self-reviews and brag documents, read the git history
+of your projects, and read your GitHub repositories and pull requests (`gh auth login` first; `brew install gh` or
+see [cli.github.com](https://cli.github.com)). It lists file names first and reads only what you approve. Then it asks
+only about what those don't cover. It helps to have at hand:
 - Your current resume or LinkedIn "Experience" text (as raw material; the wording will change).
 - For each job and project: what it was, why it existed, what *you* did, how big it was, and any numbers you know,
   with what each number measures.

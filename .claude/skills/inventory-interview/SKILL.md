@@ -22,8 +22,13 @@ guesses. The person had every fact needed; they just didn't know which ones the 
 
 ## 1. Start from what exists
 
-Read `workspace/inventory.md`. If the user has an old resume, LinkedIn text or a brag document, ask them to paste it,
-and record the facts in it (not the wording) as a starting point, marked "from old resume, unconfirmed".
+Read `workspace/inventory.md`. If the `gather-sources` skill hasn't run, offer it first: with consent it reads old
+resumes, self-reviews, local repositories and GitHub, so you only ask about what they don't answer. If the user would
+rather paste things (an old resume, LinkedIn text, a brag document), record the facts in them (not the wording),
+marked "from old resume, unconfirmed".
+
+Start the question list with what the sources left open: every fact marked *unconfirmed* (a quick yes, no or
+correction each), and every conflict between sources (two versions of one number, a status that may have changed).
 
 ## 2. Ask, per entry (job, internship, startup, open source, serious project)
 

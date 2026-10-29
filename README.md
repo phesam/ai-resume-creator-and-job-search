@@ -72,7 +72,8 @@ Your files (inventory, profile, resume, application history, runs) live in `work
 | Step | You say | What happens | Skill |
 |---|---|---|---|
 | 1 | "set me up" | Checks your machine, asks ~10 questions (where you want to work, years limit, referrals...), fills `profile.yaml` | [setup](.claude/skills/setup/SKILL.md) |
-| 2 | "interview me" | Asks everything it needs about your work in one list; records every fact, dated, in `inventory.md` | [inventory-interview](.claude/skills/inventory-interview/SKILL.md) |
+| 2 | "use my old resumes and GitHub" | With your OK, finds old resumes, reviews, local repos and GitHub pull requests; lists them, reads what you approve, records the facts as unconfirmed | [gather-sources](.claude/skills/gather-sources/SKILL.md) |
+| 2b | "interview me" | Asks, in one list, only what your sources didn't answer, plus every conflict between them; records every fact, dated, in `inventory.md` | [inventory-interview](.claude/skills/inventory-interview/SKILL.md) |
 | 3 | "write my resume" | Drafts bullets one at a time from the inventory; you pick and edit; builds and checks the PDF | [resume-workshop](.claude/skills/resume-workshop/SKILL.md) |
 | 4 | "review my resume" | Reads it as software, a recruiter and a hiring manager would; audits every claim; changes nothing | [resume-review](.claude/skills/resume-review/SKILL.md) |
 | 5 | "I want a job at Acme" | Every Acme posting fetched, screened, read in full, ranked; history checked | [find-jobs](.claude/skills/find-jobs/SKILL.md) |
@@ -88,7 +89,8 @@ The full set, with the reason and a before/after for each, is the [resume playbo
 - **What + how + why.** "Built the Node.js/GraphQL service that lets clinic staff change their schedules (~2M
   requests/day), so a schedule change takes ~2 minutes instead of a support ticket and a next-day release." A list of
   tools with no purpose fails, however many keywords it hits.
-- **Interview first.** Facts come from you, recorded in an inventory. Nothing goes on the page that isn't there.
+- **Gather, then interview.** With your OK it reads your old resumes, reviews, repos and GitHub first, then asks only
+  about the gaps and conflicts. Facts are recorded in an inventory; nothing goes on the page that isn't there.
 - **Your real scope.** "Added X through a service", not "built the platform", when you built one layer.
 - **Best result where the eye lands,** with its contrast right next to it.
 - **Never drop a number without asking what it measures; never upgrade a status** (projected, A/B tested, merged).
@@ -125,6 +127,7 @@ python3 -m jobhunt resume --all                    # build every resume variant 
 python3 -m jobhunt watch | fresh list --days 8 | fresh show "Acme" <id>
 python3 -m jobhunt applied add|list|stats|import-email
 python3 -m jobhunt resolve "Acme" | detect <careers-url> | register --name ... --ats ... --token ...
+python3 -m jobhunt gather | gather text <file>   # with your consent: find old resumes, repos, GitHub activity
 python3 -m jobhunt privacy-check
 python3 -m pytest tests -q
 ```

@@ -6,6 +6,12 @@ instead, hold the AI to the same rules.
 
 ## About facts
 
+- **Read before asking, with permission.** With your OK, the AI reads your old resumes, reviews, project histories and
+  GitHub first, so it asks only about gaps. It lists file names before opening anything, reads only what you approve,
+  and never opens files that look like taxes, banking, medical or ID papers.
+- **Old resumes are evidence, not truth.** Earlier versions, especially AI-tailored ones, can hold inflated scope and
+  wrong numbers. Facts from them are marked unconfirmed until you confirm them.
+
 - **The inventory is the only source of truth.** Nothing goes on the resume, into an application answer or into a
   job review that isn't in `workspace/inventory.md`. New facts go there first, dated.
 - **Ask, don't guess.** When a fact is missing (why something was built, who used it, your part, what a number

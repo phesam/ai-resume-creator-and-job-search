@@ -1,6 +1,6 @@
 ---
 name: setup
-description: First-run setup for the resume and job-search workflow. Use when the user says "set me up", "get started", "how do I use this", or when workspace/ doesn't exist yet. Checks the machine, creates the workspace, fills profile.yaml by asking a short list of questions, then hands off to the inventory interview.
+description: First-run setup for the resume and job-search workflow. Use when the user says "set me up", "get started", "how do I use this", or when workspace/ doesn't exist yet. Checks the machine, creates the workspace, fills profile.yaml by asking a short list of questions, then gathers what the user already has (with consent) and hands off to the inventory interview.
 ---
 
 # setup: from a fresh clone to a working workspace
@@ -64,6 +64,8 @@ Show the profile changes in a few lines. Run `python3 -m jobhunt doctor` again (
 
 ## 4. Hand off
 
-Start the `inventory-interview` skill. If the user only wants jobs today and already has a resume they like, they can
+Start the `gather-sources` skill: with the user's consent it finds their old resumes, reviews, local repositories and
+GitHub activity, so the interview only asks about what those don't answer. Then the `inventory-interview` skill.
+If the user only wants jobs today and already has a resume they like, they can
 skip to `find-jobs`, but the reviewers score fit against `inventory.md`, so at least a rough inventory (paste the
 resume text into it) has to exist first.
