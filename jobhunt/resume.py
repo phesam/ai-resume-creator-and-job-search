@@ -9,9 +9,12 @@ page ends up full (no big empty band at the bottom) without shrinking text more 
 If even the most compact layout overflows, or the roomiest leaves a gap, we say so instead of hiding it.
 
 Checks on every build (ship only when status is ok and lint and short_last_lines are empty):
+  status            ok: one full page. overflow: too long. underfull: blank space at the bottom. Only an ok build is
+                    written to the final path; the others go to .overflow.pdf or .underfull.pdf, so a page with a gap
+                    can't be sent by accident. Body text stays 10.5-10.9pt: thin content fails, it doesn't get bigger.
   lint              the text an ATS extracts: odd Unicode, contact details, every bullet verbatim, reading order
-  short_last_lines  bullets that wrap onto a nearly empty last line (an orphan word)
-  style             advisory: weak openers, more than one bold, no number or stated purpose, overused keywords,
+  short_last_lines  a stranded word on a last line, or a bullet running to three lines
+  style             advisory: weak openers, too much bold, no number or stated purpose, overused keywords,
                     first person, banned phrases and internal jargon you listed in resume.yaml
 """
 
@@ -31,6 +34,8 @@ from collections import Counter
 from pathlib import Path
 
 import yaml
+
+from .terms import technical_terms
 
 PAGE_H = 792.0  # letter, points
 PAGE_W = 612.0
@@ -62,12 +67,21 @@ def find_chrome() -> str | None:
 # compact -> roomy presets (font pt, line-height, bullet gap pt, entry gap pt, section gap pt, margin in)
 # The bullet and entry gaps are deliberately generous: with 0.6-2.4pt gaps, bullets ran together into one block that
 # read as a wall of text. The fit loop pays for the gaps with slightly smaller text.
+# Body text stays between 10.5 and 11pt: that is what a page of real content looks like. There is deliberately no bigger
+# preset. Growing the text to 12pt and widening the margins is how a thin resume ends up looking thin; thin content has to
+# fail the build instead, so it gets more content.
 PRESET_LO = dict(font=10.5, lh=1.12, bullet=3.2, entry=5.0, section=5.0, margin_tb=0.45, margin_lr=0.55, name=19.0)
-PRESET_HI = dict(font=12.0, lh=1.28, bullet=4.6, entry=8.0, section=10.0, margin_tb=0.65, margin_lr=0.70, name=22.0)
+PRESET_HI = dict(font=10.9, lh=1.16, bullet=3.8, entry=6.0, section=7.0, margin_tb=0.5, margin_lr=0.6, name=20.0)
+FILL_TOLERANCE_PT = 7.0  # a finished page ends within this of the bottom margin: about half a line
+MAX_STRETCH_PT = 0.8     # the most added per bullet gap to close the last line or so (entries get 1.5x, sections 2x)
 
 
-def lerp(t: float) -> dict:
-    return {k: PRESET_LO[k] + (PRESET_HI[k] - PRESET_LO[k]) * t for k in PRESET_LO}
+def lerp(t: float, stretch: float = 0.0) -> dict:
+    p = {k: PRESET_LO[k] + (PRESET_HI[k] - PRESET_LO[k]) * t for k in PRESET_LO}
+    p["bullet"] += stretch
+    p["entry"] += 1.5 * stretch
+    p["section"] += 2 * stretch
+    return p
 
 
 # ----------------------------------------------------------------------------- data
@@ -132,8 +146,8 @@ def _contact_item(x: str) -> str:
     return shown
 
 
-def render_html(r: dict, t: float) -> str:
-    p = lerp(t)
+def render_html(r: dict, t: float, stretch: float = 0.0) -> str:
+    p = lerp(t, stretch)
     h = r["header"]
     accent = (r.get("style") or {}).get("accent", "#1d4f91")
     contact = " | ".join(_contact_item(x) for x in h["contact"])
@@ -164,7 +178,8 @@ def render_html(r: dict, t: float) -> str:
             items = []
             for e in r["education"]:
                 detail = f'<div class="row sub"><span class="l">{_inline(e.get("detail", ""))}</span><span class="r">{_inline(e.get("location", ""))}</span></div>' if e.get("detail") else ""
-                items.append(f'<div class="entry"><div class="row"><span class="l"><b>{_inline(e["school"])}</b></span><span class="r">{_inline(e.get("dates", ""))}</span></div>{detail}</div>')
+                lines = "".join(f'<div class="row sub"><span class="l">{_inline(x)}</span></div>' for x in e.get("lines") or [])
+                items.append(f'<div class="entry"><div class="row"><span class="l"><b>{_inline(e["school"])}</b></span><span class="r">{_inline(e.get("dates", ""))}</span></div>{detail}{lines}</div>')
             parts.append('<section><h2>Education</h2>' + "".join(items) + "</section>")
         elif sec == "skills" and r.get("skills"):
             rows = "".join(f'<div class="skill"><b>{_inline(k)}:</b> {_inline(v)}</div>' for k, v in r["skills"].items())
@@ -279,8 +294,9 @@ def _norm_txt(s: str) -> str:
     return re.sub(r"\s+", "", s.replace("**", ""))
 
 
-def short_last_lines(pdf_path: Path, resume: dict, min_ratio: float = 0.3) -> list[str]:
-    """Bullets that wrap onto a nearly empty last line (a 'widow'). Returns fix suggestions."""
+def short_last_lines(pdf_path: Path, resume: dict, min_ratio: float = 0.12) -> list[str]:
+    """Bullets with a stranded word or two on their last line, or that run to three lines. A last line that merely runs
+    short is fine and wanted: bullets that all fill both lines read as one block. Returns fix suggestions."""
     lines = _pdf_lines(pdf_path)
     if not lines:
         return []
@@ -303,9 +319,11 @@ def short_last_lines(pdf_path: Path, resume: dict, min_ratio: float = 0.3) -> li
         if len(used) >= 2:
             last = used[-1]
             ratio = (last["x1"] - last["x0"]) / full_w
-            if ratio < min_ratio:
-                n = len(last["text"])
-                issues.append(f"short last line ({ratio:.0%} wide): cut ~{n + 2} characters or add detail -> '{b[:70]}...'")
+            if ratio < min_ratio or len(last["text"].split()) <= 2:
+                issues.append(f"stranded word on the last line: reword to lose ~{len(last['text']) + 2} characters (don't pad "
+                              f"to fill the line) -> '{b[:70]}...'")
+        if len(used) >= 3:
+            issues.append(f"runs to {len(used)} lines; two is the limit: cut its least important part -> '{b[:70]}...'")
     return issues
 
 
@@ -344,6 +362,18 @@ def lint_pdf(pdf_path: Path, resume: dict) -> list[str]:
             words = plain.split(" ")
             bad = next((w for i, w in enumerate(words) if " ".join(words[: i + 1]) not in flat_cmp), words[0])
             problems.append(f"text does not extract verbatim near '{bad}': {plain[:70]}...")
+    lines = _pdf_lines(pdf_path)
+    names = {"EXPERIENCE", "EDUCATION", "PROJECTS", "SKILLS", str(resume.get("projects_heading") or "").upper()}
+    first_head = next((l for l in lines if l["text"].strip().upper() in names), None)
+    if first_head and len({round(l["y"]) for l in lines if l["y"] < first_head["y"] - 1}) > 2:
+        problems.append("the contact line wraps onto a second row; drop an item so it fits on one")
+    # Skills stay on one line each: a wrapped skills line is a list that has grown past what anyone reads.
+    skill_rows = list((resume.get("skills") or {}).items())
+    head = next((l for l in lines if l["text"].strip().upper() == "SKILLS"), None)
+    if head and skill_rows and resume["section_order"][-1] == "skills":
+        rows = len({round(l["y"]) for l in lines if l["y"] > head["y"] + 1})
+        if rows > len(skill_rows):
+            problems.append(f"a skills line wraps onto a second line; cut it to one line each ({len(skill_rows)} rows take {rows} lines)")
     long_bullets = []
     for coll in (resume.get("experience", []), resume.get("projects", [])):
         for item in coll:
@@ -365,31 +395,39 @@ PURPOSE = re.compile(r"\d|\benabl|\bso\b|\breplac|\binstead of\b|\bused\b|\badop
                      r"\bto (?:help|let|catch|cut|reduce|speed|stop|prevent|keep|make|give|find|track|show|standardize)\b|"
                      r"\bwhich\b|\bwon\b|\bshipped\b|\bcutting\b|\breducing\b|\bsaving\b|\bfixing\b|\bpreventing\b", re.I)
 FIRST_PERSON = re.compile(r"\b(?:I|me|my|we|our)\b")
+QUOTED = re.compile(r"""(?<!\w)['"‘“].*?['"’”](?!\w)""")
+MIN_BULLET_CHARS = 150    # under this a bullet is a one-liner: one line for what, one for why needs about two
+MIN_TERMS_PER_BULLET = 2  # a strong page shows about three distinct technical terms per bullet; a plain one about one
+FULL_BULLET_CHARS = 205   # about two full lines. Past 60% of the page at this length, it reads as one block
 
 
 def lint_style(r: dict, rules: dict | None = None) -> list[str]:
-    """Advisory checks from the bullet rules in docs/RESUME_PLAYBOOK.md. They never block a build: a person decides.
+    """Advisory checks from docs/RESUME_PLAYBOOK.md. They never block a build: a person decides.
 
-    `rules` comes from resume.yaml `writing:` keys `banned_phrases` and `jargon` (internal names an outsider can't
-    read) and `max_keyword_repeats` (default 3)."""
+    A minor entry (a single bullet on anything but the first job) may stay a plain one-liner, and a colon-led list of
+    what was set up is an accepted pattern for the production-ownership bullet.
+    `rules` comes from resume.yaml `writing:` keys `banned_phrases`, `jargon` (private names an outsider can't read; public
+    technical terms are fine) and `max_keyword_repeats` (default 3)."""
     rules = rules or {}
     banned = [b.lower() for b in DEFAULT_BANNED + list(rules.get("banned_phrases") or [])]
     jargon = list(rules.get("jargon") or [])
     out = []
-    bullets = [(it.get("title") or it.get("org") or "", b) for coll in (r.get("experience", []), r.get("projects", []))
-               for it in coll for b in it["bullets"]]
-    for where, b in bullets:
+    items = [it for coll in (r.get("experience", []), r.get("projects", [])) for it in coll]
+    first = items[0] if items else None
+    bullets = [(it.get("title") or it.get("org") or "", b, len(it["bullets"]) == 1 and it is not first)
+               for it in items for b in it["bullets"]]
+    for where, b, minor in bullets:
         plain = b.replace("**", "")
         short = f"{where}: '{plain[:60]}...'"
         if WEAK_OPENERS.search(plain):
             out.append(f"weak opener (say what you built or changed): {short}")
-        if b.count("**") > 2:
-            out.append(f"more than one bold item; bold one thing a skimmer should catch: {short}")
-        if not PURPOSE.search(plain):
-            out.append(f"no number and no stated purpose: can a recruiter repeat what it was for? {short}")
-        if len(plain) < 90:
-            out.append(f"short ({len(plain)} chars): does it say what you built AND why it mattered? {short}")
-        if FIRST_PERSON.search(plain):
+        if b.count("**") > 4:
+            out.append(f"too much bold; bold the one or two things a skimmer should catch: {short}")
+        if not minor and not PURPOSE.search(plain) and ":" not in plain:
+            out.append(f"no number and no stated purpose: can a reader say what it was for? {short}")
+        if not minor and len(plain) < MIN_BULLET_CHARS:
+            out.append(f"thin ({len(plain)} chars): a main bullet needs about two lines, what and why. {short}")
+        if FIRST_PERSON.search(QUOTED.sub(" ", plain)):
             out.append(f"first person (drop I/my/we): {short}")
         low = plain.lower()
         for phrase in banned:
@@ -397,15 +435,27 @@ def lint_style(r: dict, rules: dict | None = None) -> list[str]:
                 out.append(f"phrase on your banned list '{phrase}': {short}")
         for term in jargon:
             if re.search(rf"\b{re.escape(term)}\b", plain):
-                out.append(f"internal name '{term}' an outsider can't read; say what it does: {short}")
+                out.append(f"private name '{term}' an outsider can't read; say what it does: {short}")
+    texts = [b.replace("**", "") for _, b, _ in bullets]
+    for rx, shape in ((r",\s+so\b", "', so ...'"), (r"\binstead of\b", "'instead of'")):
+        n = sum(1 for t in texts if re.search(rx, t))
+        if n >= 3:
+            out.append(f"{n} bullets lean on {shape}: the same sentence shape over and over reads as generated. Vary them")
+    full = sum(1 for t in texts if len(t) >= FULL_BULLET_CHARS)
+    if len(texts) >= 8 and full / len(texts) > 0.6:
+        out.append(f"{full} of {len(texts)} bullets fill both lines, so the page reads as one block. Shorten a few where a clause adds the least")
+    text = " ".join(texts)
+    tech = technical_terms(text + " " + " ".join(str(it.get("org") or "") for it in items))
+    if bullets and len(tech) / len(bullets) < MIN_TERMS_PER_BULLET:
+        out.append(f"the page reads plain: {len(tech)} distinct technical terms across {len(bullets)} bullets. A strong page shows "
+                   "about three per bullet: name the systems, failures and methods an engineer would respect")
     skills = ", ".join((r.get("skills") or {}).values())
     terms = {t.strip() for t in re.split(r",|;", skills) if len(t.strip()) > 2}
-    text = " ".join(b.replace("**", "") for _, b in bullets)
     limit = int(rules.get("max_keyword_repeats", 3))
     for t in sorted(terms):
         n = len(re.findall(rf"(?<![\w+#]){re.escape(t)}(?![\w+#])", text))
         if n > limit:
-            out.append(f"'{t}' appears in {n} bullets; past {limit} it reads as keyword stuffing")
+            out.append(f"'{t}' appears in {n} bullets; past {limit} swap the extras for the broader word postings use (service, API, backend)")
     return out
 
 
@@ -448,58 +498,91 @@ def build(yaml_path: Path, out_pdf: Path, variant: str | None = None, target_gap
     work = Path(tempfile.mkdtemp(prefix="jh-resume-"))
     html_path, pdf_tmp = work / "resume.html", work / "resume.pdf"
 
-    def try_t(t: float) -> dict:
-        html_path.write_text(render_html(r, t))
+    def try_t(t: float, stretch: float = 0.0) -> dict:
+        html_path.write_text(render_html(r, t, stretch))
         chrome_pdf(html_path, pdf_tmp)
         m = measure(pdf_tmp)
         m["t"] = round(t, 3)
         return m
 
+    def clear_outputs() -> list[str]:
+        """Remove every earlier output. An older PDF that no longer matches the source could be sent by mistake."""
+        gone = [p for p in (out_pdf, out_pdf.with_suffix(".html")) if p.exists()]
+        for p in gone + [out_pdf.with_suffix(x) for x in (".overflow.pdf", ".underfull.pdf")]:
+            p.unlink(missing_ok=True)
+        return [str(p) for p in gone]
+
     lo_m = try_t(0.0)
+    lo_p = lerp(0.0)
+    # How much more fits at the most compact layout, so wordings can be proposed without a test build.
+    room_lines = max(0, int((lo_m["bottom_gap_pt"] - lo_p["margin_tb"] * 72) / (lo_p["font"] * lo_p["lh"])))
     if lo_m["pages"] > 1:
-        # Never leave an older one-page PDF at this path: it no longer matches the source and could be sent by mistake.
-        removed = [str(p) for p in (out_pdf, out_pdf.with_suffix(".html")) if p.exists()]
-        for p in removed:
-            Path(p).unlink()
+        removed = clear_outputs()
         shutil.copy(pdf_tmp, out_pdf.with_suffix(".overflow.pdf"))
         shutil.rmtree(work, ignore_errors=True)
         return {"status": "overflow", "pages": lo_m["pages"], "measure": lo_m,
                 "detail": f"Content needs {lo_m['pages']} pages even at the most compact layout. Cut a bullet or project "
-                          f"(the weakest internship first, then the weakest project). The over-long render is at "
+                          f"(a minor entry down to one line first, then the weakest project bullet). The over-long render is at "
                           f"{out_pdf.with_suffix('.overflow.pdf')}" + (f"; the outdated PDF was removed: {removed}" if removed else "."),
                 "lint": [], "short_last_lines": [], "style": []}
-    leftover = out_pdf.with_suffix(".overflow.pdf")
-    if leftover.exists():
-        leftover.unlink()
     hi_m = try_t(1.0)
     best_t, best_m = (1.0, hi_m) if hi_m["pages"] == 1 else (0.0, lo_m)
     if hi_m["pages"] > 1:
         lo, hi = 0.0, 1.0
-        for _ in range(8):
+        for _ in range(6):
             mid = (lo + hi) / 2
             m = try_t(mid)
             if m["pages"] == 1:
                 lo, best_t, best_m = mid, mid, m
             else:
                 hi = mid
-    final = try_t(best_t)
-    shutil.copy(pdf_tmp, out_pdf)
-    html_out = out_pdf.with_suffix(".html")
-    html_out.write_text(render_html(r, best_t))
+    # Line breaks move in whole lines, so the best size can still stop up to a line short of the margin. Spread what is
+    # left through the gaps between bullets, entries and sections, so it never sits as a band at the bottom.
     margin_bottom_pt = lerp(best_t)["margin_tb"] * 72
+    fits = lambda m: m["pages"] == 1 and m["bottom_gap_pt"] >= margin_bottom_pt  # noqa: E731
+    best_s = 0.0
+    if try_t(best_t)["bottom_gap_pt"] - margin_bottom_pt > 1:
+        if fits(try_t(best_t, MAX_STRETCH_PT)):
+            best_s = MAX_STRETCH_PT
+        else:
+            lo_s, hi_s = 0.0, MAX_STRETCH_PT
+            for _ in range(4):
+                mid = (lo_s + hi_s) / 2
+                if fits(try_t(best_t, mid)):
+                    lo_s, best_s = mid, mid
+                else:
+                    hi_s = mid
+    final = try_t(best_t, best_s)
+    used = lerp(best_t, best_s)
     usable_gap = round(final["bottom_gap_pt"] - margin_bottom_pt, 1)
-    status = "ok"
-    note = ""
+    line_pt = used["font"] * used["lh"]
+    bullets = [b.replace("**", "") for coll in (r.get("experience", []), r.get("projects", [])) for it in coll for b in it["bullets"]]
+    lines_short = max(1, round(usable_gap / line_pt)) if usable_gap > FILL_TOLERANCE_PT else 0
+    status, note = "ok", ""
     if final["pages"] != 1:
         status, note = "error", "final render is not one page"
-    elif best_t >= 0.999 and usable_gap > 36:
-        status, note = "underfull", f"~{usable_gap:.0f}pt of empty space at the bottom even at the roomiest layout; add a bullet or project"
-    problems = lint_pdf(out_pdf, r)
-    widows = short_last_lines(out_pdf, r)
+    elif lines_short:
+        thin = sum(1 for b in bullets if len(b) < MIN_BULLET_CHARS)
+        status = "underfull"
+        note = (f"The page ends about {lines_short} line{'s' if lines_short != 1 else ''} short of the bottom margin, leaving "
+                f"blank space. A finished page is full. Add real content from the inventory: "
+                + (f"bring the {thin} thin bullet{'s' if thin != 1 else ''} up to two full lines (what you did, then why), then " if thin else "")
+                + "add the next-strongest bullet or entry. If the inventory has nothing left, interview for more. Never pad.")
+    clear_outputs()
+    target = out_pdf if status == "ok" else out_pdf.with_suffix(f".{status}.pdf")
+    shutil.copy(pdf_tmp, target)
+    html_out = out_pdf.with_suffix(".html")
+    html_out.write_text(render_html(r, best_t, best_s))
+    problems = lint_pdf(target, r)
+    widows = short_last_lines(target, r)
     style = lint_style(r, (yaml.safe_load(yaml_path.read_text()) or {}).get("writing") or {})
     report = {"status": status, "note": note, "variant": r["variant"], "density_t": round(best_t, 3), "measure": final,
-              "empty_space_above_bottom_margin_pt": usable_gap, "lint": problems, "short_last_lines": widows,
-              "style": style, "pdf": str(out_pdf), "html": str(html_out)}
+              "empty_space_above_bottom_margin_pt": usable_gap,
+              "fill": {"font_pt": round(used["font"], 2), "bullets": len(bullets),
+                       "avg_bullet_chars": round(sum(map(len, bullets)) / max(len(bullets), 1)),
+                       "technical_terms": len(technical_terms(" ".join(bullets))),
+                       "lines_on_page": len(_pdf_lines(target)), "lines_short": lines_short, "lines_of_room": room_lines},
+              "lint": problems, "short_last_lines": widows, "style": style, "pdf": str(target), "html": str(html_out)}
     shutil.rmtree(work, ignore_errors=True)
     return report
 
@@ -514,7 +597,7 @@ def main(argv=None) -> int:
     a = ap.parse_args(argv)
     rep = build(a.yaml, a.out, a.variant, emphasize=[x for x in (a.emphasize or "").split(",") if x.strip()], wording=a.wording)
     print(json.dumps(rep, indent=1))
-    return 0 if rep["status"] == "ok" and not rep.get("lint") else 1
+    return 0 if rep["status"] == "ok" and not rep.get("lint") and not rep.get("short_last_lines") else 1
 
 
 if __name__ == "__main__":
