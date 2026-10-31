@@ -87,8 +87,8 @@ the work-match score makes sense. If an order looks wrong, find out why (a misre
 fix the input. Never hand-edit scores.
 
 ## 6. Resume
-Pick the variant by what the top roles' postings ask for (`resume_focus`, enforced by `posting_must_mention` in the
-profile), not by the company. One PDF per variant in `workspace/resume/<variant>/`; rebuild only when `resume.yaml`
+Pick the variant by reading what the top roles do all day (`resume_focus`, checked by `posting_must_mention` in the
+profile), not by the company or a word match: a term in passing, or one naming another team, doesn't make it a specialist role. One PDF per variant in `workspace/resume/<variant>/`; rebuild only when `resume.yaml`
 changed. Optional, for a role the user picks: reorder skills to the posting's must-haves (reorder only):
 `python3 -m jobhunt resume --variant <v> --emphasize "C++,Python" --out <run>/<job-id>/<Name>_Resume.pdf`.
 

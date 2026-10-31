@@ -32,7 +32,7 @@ Say, briefly, and wait for the answer:
 >    CVs, cover letters, self-reviews, brag documents, LinkedIn PDF exports. First I only list file names and dates;
 >    you pick what I read.
 > 2. **Find code repositories** on this computer and read their git history for commits you wrote, the languages,
->    and each README. I don't read your source code.
+>    and each README. I read source code only for projects you pick, so I can list what you built in your biggest ones.
 > 3. **Read your GitHub** through the `gh` command (signed in as you): your repositories and the pull requests you
 >    opened on other projects, including whether they were merged.
 >
@@ -67,7 +67,10 @@ read. A good default to propose:
   versions of one resume, read the newest fully, then the others only for facts, numbers or entries the newest lacks.
 - **Repositories:** read the README, the manifest files (`package.json`, `pyproject.toml`, ...) for the stack, and
   their own commit messages: `git -C <repo> log HEAD --author=<email> --format="%ad %s" --date=short`. Note what the
-  project is, what they built, when, with what. Don't read source code unless they ask, and never read secrets.
+  project is, what they built, when, with what. Never read secrets.
+- **Big projects they approved:** read the code as well as the log, because commit messages undersell. Measure their share at their last
+  commit (`git -C <repo> log --author=<email> -1 --format=%H`, then `git -C <repo> blame -s <commit> -- <file>` on the main files), and
+  make a menu of everything they built with that share, including shipping and release work. The `inventory-interview` skill puts it to them.
 - **GitHub:** for each pull request to another project, note the project, what it fixed or added, and its status
   (merged or open) with the link. Check the status again right before it goes on a resume: it changes.
 - If something worth knowing can't be read (a scanned PDF with no text, an iCloud file not downloaded), say so.
@@ -80,7 +83,8 @@ Add the facts to `workspace/inventory.md`, in each entry's fields, each tagged w
 - numbers with whatever the source says they measure;
 - **conflicts between sources** side by side ("Resume_2023 says 300K requests/day; Resume_2024 says 800K");
 - claims that look inflated or vague ("architected the platform", "spearheaded"), to ask about scope.
-Don't copy resume wording as the final wording; it's evidence.
+Don't copy resume wording as the final wording; it's evidence. Save it, though: **older versions often hold something stronger than the
+current page**, and the workshop sweeps them once before finishing.
 
 ## 5. Then ask
 
@@ -88,4 +92,4 @@ Tell the user in a few lines what you found (how many entries, the strongest new
 off to the `inventory-interview` skill, which asks in one numbered list about:
 - every unconfirmed fact (a quick yes/no or correction),
 - every conflict between sources,
-- whatever each entry still lacks: why it existed, their exact part, scale, results from what to what, status.
+- whatever each entry still lacks: why it existed, their exact part, scale, results from what to what, status, the hardest part.
