@@ -10,6 +10,10 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 
+def pytest_configure(config):
+    config.addinivalue_line("markers", "slow: renders real PDFs; `jobhunt doctor` skips these, plain pytest runs them")
+
+
 @pytest.fixture(autouse=True)
 def workspace(tmp_path, monkeypatch):
     ws = tmp_path / "workspace"

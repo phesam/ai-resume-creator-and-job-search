@@ -15,6 +15,7 @@ Run from the repository root. Your files live in workspace/ (or $JOBHUNT_WORKSPA
   python3 -m jobhunt applied add --company X --title "..." --url ...    # log an application
   python3 -m jobhunt applied import-email           # rebuild history from workspace/email_import/*.jsonl
   python3 -m jobhunt resolve "Company" | detect <careers-url> | register --name X --ats greenhouse --token x
+  python3 -m jobhunt keywords --companies "A,B,C"   # what those postings ask for vs what your resume shows
   python3 -m jobhunt gather                         # (with your consent) list old resumes, local repos, GitHub activity
   python3 -m jobhunt privacy-check                  # scan the repo for your personal terms before committing
 """
@@ -27,6 +28,7 @@ import json
 import re
 import shutil
 import sys
+import tempfile
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import date, datetime
@@ -110,7 +112,8 @@ def cmd_doctor(a) -> int:
         checks.append(("profile.yaml parses", True))
     except Exception as e:  # noqa: BLE001
         checks.append((f"profile.yaml: {e}", False))
-    t = subprocess.run([sys.executable, "-m", "pytest", str(ROOT / "tests"), "-q"], capture_output=True, text=True, cwd=ROOT)
+    t = subprocess.run([sys.executable, "-m", "pytest", str(ROOT / "tests"), "-q", "-m", "not slow"], capture_output=True,
+                       text=True, cwd=ROOT)
     last = t.stdout.strip().splitlines()[-1] if t.stdout.strip() else t.stderr[:80]
     checks.append((f"tests: {last}", t.returncode == 0))
     for name, ok in checks:
@@ -541,8 +544,13 @@ def cmd_resume(a) -> int:
     ok = True
     for v in todo:
         out = Path(a.out) if (a.out and not a.all) else paths.resume_dir() / v / stem
-        rep = resume.build(src, out, v, emphasize=[x for x in (a.emphasize or "").split(",") if x.strip()], wording=a.wording)
-        print(json.dumps(rep, indent=1))
+        if a.check:  # nothing is written where the user would see it: this only answers "does it fit?"
+            with tempfile.TemporaryDirectory() as d:
+                rep = resume.build(src, Path(d) / stem, v, wording=a.wording)
+            print(json.dumps({k: rep.get(k) for k in ("status", "note", "detail", "fill", "lint", "short_last_lines", "style") if k in rep}, indent=1))
+        else:
+            rep = resume.build(src, out, v, emphasize=[x for x in (a.emphasize or "").split(",") if x.strip()], wording=a.wording)
+            print(json.dumps(rep, indent=1))
         ok = ok and rep["status"] == "ok" and not rep.get("lint") and not rep.get("short_last_lines")
     return 0 if ok else 1
 
@@ -640,6 +648,11 @@ def cmd_applied(a) -> int:
     return 0
 
 
+def cmd_keywords(a) -> int:
+    from .keywords import run
+    return run(a)
+
+
 def cmd_gather(a) -> int:
     from .gather import run
     return run(a)
@@ -694,6 +707,7 @@ def main(argv=None) -> int:
 
     rs = sub.add_parser("resume", help="build the one-page resume PDF and run every check")
     rs.add_argument("--variant")
+    rs.add_argument("--check", action="store_true", help="report fit only; write no PDF (for fine-tuning without test files)")
     rs.add_argument("--all", action="store_true", help="build every variant")
     rs.add_argument("--yaml", help="resume source (default workspace/resume.yaml)")
     rs.add_argument("--out", help="output PDF (default workspace/resume/<variant>/<Name>_Resume.pdf)")
@@ -741,6 +755,13 @@ def main(argv=None) -> int:
     ap.add_argument("--notes")
     ap.add_argument("--when")
     ap.set_defaults(fn=cmd_applied)
+
+    kw = sub.add_parser("keywords", help="count which technologies target postings ask for, and whether your resume shows them")
+    kw.add_argument("--companies", help="comma-separated registry names; their matching postings are fetched")
+    kw.add_argument("--match", default="engineer|developer", help="regex on titles (default: engineer|developer)")
+    kw.add_argument("--limit", type=int, default=200)
+    kw.add_argument("--run", help="use a run folder's candidates instead of fetching")
+    kw.set_defaults(fn=cmd_keywords)
 
     ga = sub.add_parser("gather", help="with your consent: find old resumes, reviews, local repos and GitHub activity")
     ga.add_argument("action", nargs="?", choices=["scan", "text"], default="scan",

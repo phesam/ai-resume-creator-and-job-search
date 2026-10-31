@@ -4,10 +4,13 @@ import json
 import shutil
 import subprocess
 import zipfile
+from pathlib import Path
 
 import pytest
 
 from jobhunt import gather
+
+ROOT = Path(__file__).resolve().parents[1]
 
 
 def _touch(p, text="x"):
@@ -121,3 +124,50 @@ def test_manifest_is_written_to_the_workspace(workspace, tmp_path):
     assert md == workspace / "sources" / "manifest.md"
     text = md.read_text()
     assert "resume.pdf" in text and "nothing below has been opened yet" in text and "not installed" in text
+
+
+def test_keywords_marks_what_your_resume_shows(workspace, capsys):
+    from types import SimpleNamespace
+
+    from jobhunt import keywords
+    run = workspace / "runs" / "acme"
+    run.mkdir(parents=True)
+    desc = "We use Kafka, Go and Terraform with PostgreSQL. " * 6
+    (run / "candidates.json").write_text(json.dumps([{"title": "Backend Engineer", "description": desc}] * 3))
+    (workspace / "resume.yaml").write_text('experience:\n  - bullets: ["Built a Kafka consumer in Java"]\nskills:\n  Tools: "Terraform"\n')
+    (workspace / "inventory.md").write_text("Used PostgreSQL at my last job.")
+    assert keywords.run(SimpleNamespace(run=str(run), companies=None)) == 0
+    out = capsys.readouterr().out
+    assert "| Kafka | 3 | 100% | in a bullet |" in out
+    assert "| Terraform | 3 | 100% | skills line only |" in out
+    assert "| PostgreSQL | 3 | 100% | IN INVENTORY, NOT ON RESUME |" in out
+    assert "| Go | 3 | 100% | - |" in out
+
+
+def test_keywords_never_suggests_what_you_said_not_to_claim(workspace, capsys):
+    from types import SimpleNamespace
+
+    from jobhunt import keywords
+    run = workspace / "runs" / "acme"
+    run.mkdir(parents=True)
+    desc = "We use Kafka, Terraform, GraphQL and PostgreSQL. " * 6
+    (run / "candidates.json").write_text(json.dumps([{"title": "Backend Engineer", "description": desc}] * 3))
+    template = (ROOT / "templates" / "inventory.md").read_text()
+    (workspace / "inventory.md").write_text(template + "Used PostgreSQL at work.\n**Do not claim:** Terraform\n- Do not list (could not defend): Kafka\n")
+    assert keywords.run(SimpleNamespace(run=str(run), companies=None)) == 0
+    out = capsys.readouterr().out
+    assert "| PostgreSQL | 3 | 100% | IN INVENTORY, NOT ON RESUME |" in out
+    assert "| Terraform | 3 | 100% | - |" in out and "| Kafka | 3 | 100% | - |" in out
+    assert "| GraphQL | 3 | 100% | - |" in out      # the inventory template's own instructions mention it
+
+
+def test_keywords_ignores_the_fictional_template_resume(workspace, capsys):
+    from types import SimpleNamespace
+
+    from jobhunt import keywords
+    run = workspace / "runs" / "acme"
+    run.mkdir(parents=True)
+    (run / "candidates.json").write_text(json.dumps([{"title": "Engineer", "description": "We use Kubernetes daily. " * 12}]))
+    shutil.copy(ROOT / "templates" / "resume.yaml", workspace / "resume.yaml")
+    assert keywords.run(SimpleNamespace(run=str(run), companies=None)) == 0
+    assert "| Kubernetes | 1 | 100% | - |" in capsys.readouterr().out
