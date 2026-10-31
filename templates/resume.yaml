@@ -1,17 +1,17 @@
-# Resume source. Build:  python3 -m jobhunt resume --variant general   (or --all)
-# Every claim must come from workspace/inventory.md. The content below is a FICTIONAL example (Jordan Lee) so the
-# builder works out of the box; the resume workshop replaces it with yours, one bullet at a time, with your approval.
-#
-# The rules every bullet follows (docs/RESUME_PLAYBOOK.md has the reasons and before/after examples):
-#   - What you built + the stack, inside the sentence + why it mattered. A recruiter who is not an engineer must be
-#     able to repeat what you built and what it was for. A list of tools with no purpose fails.
-#   - Name the system and its scale. Put the best result where a skimmer sees it, with its contrast right next to it
-#     ("~2 minutes instead of a support ticket and a next-day release").
-#   - Your real scope: "added X through a service", never "built the platform" when you built one layer of it.
-#   - About two lines: one for what, one for why. Bold at most one thing per bullet.
-#   - No internal names, team sizes, process trivia, or filler ("increasing velocity", "various", "leveraged").
-# Formatting: one page, one column, no city in the header (it gets you filtered as non-local), citizenship in the
-# header only when it matters for your targets, no summary, two skills lines of things you can be questioned on.
+# Resume source. Build:  python3 -m jobhunt resume --variant general   (or --all; --check reports fit without writing a PDF)
+# Every claim must come from workspace/inventory.md. The content below is a FICTIONAL example (Jordan Lee) at the density
+# a finished page should have: full to the bottom margin, 7 entries, 13 bullets, about 195 characters each, about three
+# technical terms per bullet. The resume workshop replaces it with yours, one bullet at a time, with your approval.
+# docs/RESUME_PLAYBOOK.md has every rule and the reason for it. The short version:
+#   - The default reader is the engineer who decides. Serve the recruiter through word order: the plain "what" comes
+#     first, the technical substance stays after it. Never remove engineering content to make a bullet easier to read.
+#   - Say what you built AND why it mattered, with the stack inside the sentence. Keep public technical terms even when a
+#     recruiter won't know them. Cut only private names (internal services, teams, acronyms).
+#   - Frame work at its true scope, in both directions: never "built the platform" for one layer of it, and never one
+#     page for platform-wide work. Say who couldn't do what before.
+#   - About two lines: one for what, one for why. Bold the one thing a skimmer should catch (two only for two results).
+# Format: one page, one column, full to the bottom margin, no city in the header, citizenship only when it matters for
+# your targets, no summary, two skills lines of things you can be questioned on.
 #
 # Variants are role FAMILIES, never one per posting. A bullet can be limited with `variants: [...]` or hidden with
 # `exclude_variants: [...]`; a variant can reorder projects, drop an entry and swap the skills lines.
@@ -43,60 +43,78 @@ projects_heading: "Open Source & Projects"
 
 experience:
   - id: brightline
-    title: "Software Engineer"
-    org: "Brightline Health"
+    title: "Software Engineer II"
+    org: "Brightline Health (telehealth clinics)"
     dates: "Aug 2024 – Present"
     bullets:
-      - text: "Rebuilt the patient appointment-booking flow (~250K bookings/month) in **React/TypeScript** with the Product and Design leads; abandoned bookings fell from 31% to 19% in an A/B test"
-      - text: "Built the Node.js/GraphQL service that lets clinic staff change their schedules (~2M requests/day), so a schedule change takes **~2 minutes instead of a support ticket and a next-day release**"
-      - text: "Built an end-to-end AI agent workflow that turns design mockups into form schemas, field docs and API types; adopted by three product teams as the standard way to add a booking form"
-      - text: "Took both booking services to production on the company's **Kubernetes** platform: gateway routes, Grafana dashboards, logs and alerts, plus runbooks so any on-call engineer can fix an outage"
-      - text: "Fixed a time-zone bug that showed patients appointment slots that no longer existed, adding regression tests for daylight-saving changes; double-booking support tickets dropped from ~40 a week to 2"
-  - id: robotics_lab
-    title: "Research Assistant, Autonomy Lab"
-    org: "Pacific State University"
-    dates: "Sep 2023 – May 2024"
+      # Pattern: thing (scale) in stack with senior partners as what it became; tested, shipped, reception.
+      - text: "Rebuilt Brightline's patient booking portal (>600K visits/month) in **React/TypeScript** with heads of Product and Design as a personalized feed of care tasks; A/B tested, then shipped to all patients with >80% positive ratings"
+      # The current, in-demand work goes second: input-to-output shape, reach, purpose.
+      - text: "Built an end-to-end **AI agent** workflow that turns Figma designs into intake-form schemas, field documentation, and matching API types; adopted across Brightline's product teams to standardize contributions"
+      # Pattern: capability added through a stack (scale), enabling whom, result, replacing what.
+      - text: "Added self-serve scheduling to Brightline's clinic platform through a Node.js/GraphQL service (~2M req/day), enabling clinic managers to change hours and visit types in **~2 minutes, replacing a next-day engineering release**"
+      # The production-ownership bullet: a colon list is the accepted form. It proves a cluster postings ask for.
+      - text: "Deployed new microservices on Brightline's AWS **Kubernetes** platform: set up API gateway routes and monitoring (Grafana dashboards, metrics, logs, alerts); created runbooks and provide on-call support"
+      # Pattern: concrete thing built in a named place, the failure it fixed and how; business stake labeled honestly.
+      - text: "Designed and built slot holds in the shared booking service with Redis locks, aligning three teams on a reservation API and fixing a race condition that double-booked providers; supports a projected $1.2M in visits"
+  - id: northgate
+    title: "Software/ML Engineer, Northgate-Sponsored Capstone"
+    org: "Northgate Aerospace"
+    dates: "Jan 2024 – Jun 2024"
     bullets:
-      - text: "Built a ROS 2 logging pipeline in **Python** that records a campus delivery robot's camera, lidar and GPS streams, so the lab could replay and label 300+ hours of runs instead of re-driving routes"
-      - text: "Wrote a **C++** node that flags dropped sensor frames live; found and fixed a timestamp bug that had corrupted 12% of recorded runs, and the lab's mapping paper used the cleaned data"
+      # Pattern: system for a named sponsor, a colon, then three verbs with a number on each. "Live" shows it was real.
+      - text: "Built a real-time wildfire-detection system for Northgate Aerospace: ingests live satellite thermal feeds over California (900+ frames/min), scores each frame in ~40 ms, and flags new fires on a map for understaffed dispatchers"
+      - text: "Trained its PyTorch U-Net (**94.2%** recall) and added Grad-CAM heatmaps of why each region was flagged; won **1st place** of 60 teams at the Pacific State senior showcase and presented to Northgate's engineering directors"
   - id: cartwheel
     title: "Software Engineer Intern"
     org: "Cartwheel Payments"
     dates: "Jun 2023 – Aug 2023"
     bullets:
-      - text: "Built an internal Python tool that matches failed merchant payouts to bank error codes; the support team used it daily to answer payout tickets in minutes instead of hours"
+      - text: "Rebuilt Cartwheel's payout-investigation tool solo with FastAPI and a **Python** ETL job that syncs 8M+ bank records nightly; ticket resolution time fell 60%, and company-wide support onboarding links to it"
   - id: lumen
     title: "Software Engineer Intern"
-    org: "Lumen Learning Labs"
+    org: "Lumen Learning (Bay Area edtech startup)"
     dates: "Jun 2022 – Aug 2022"
     bullets:
-      - text: "Added automated accessibility checks to the shared React component library's CI, catching 140+ contrast and labeling bugs before release so the student app passed its WCAG AA audit"
+      # A minor entry stays one plain line: it shows another real job without taking space. A smaller side item can be a
+      # single row with no bullets: set `inline_org: true`, put the description in `org`, and use `bullets: []`.
+      - text: "Built the frontend for a responsive study-planner web client with CRUD workflows and REST API integration"
 
 projects:
   - id: trailmix
     title: "TrailMix"
     link: "trailmix.example.com"
-    org: "Founder & Software Engineer · React Native, Node.js, PostgreSQL"
+    org: "Co-founder & Software Engineer · React Native, Node.js, PostgreSQL"
     dates: ""
     bullets:
-      - text: "Built and launched a trail-conditions app where hikers post closures and mud reports; grew it to **1,200 monthly users** in four months through two local hiking clubs"
-      - text: "Built it full stack: a React Native client that caches reports so hikers can read them with no signal, and a Node.js API on PostgreSQL with PostGIS search for trails near you"
-  - id: oss
-    title: "Open-source static-site generator"
-    org: "Contributor · Rust"
+      - text: "Co-founded TrailMix, a mobile safety app for backcountry hikers (offline maps, closure alerts, trip check-ins); led engineering and one intern to **12K monthly users** in five months"
+      - text: "Built it full stack: an offline-first sync engine with conflict resolution, a multi-tenant Postgres backend with PostGIS search, and signed iOS and Android builds through a GitHub Actions CI/CD pipeline"
+  - id: siteforge
+    title: "SiteForge"
+    org: "Open-source static-site generator · Rust, Python"
     dates: ""
     bullets:
-      - text: "Merged a **Rust** caching fix to a static-site generator (2K GitHub stars) that skips unchanged pages on rebuild, cutting build time for a 5,000-page benchmark site from 41 s to 24 s"
+      # An open-source bullet proves itself by naming the failure classes and how the fix was verified; it needs no metric.
+      - text: "Merged **Rust** concurrency fixes to SiteForge's incremental build cache (a data race, a use-after-free in unsafe code), with Python regression suites verified under Miri and ThreadSanitizer"
+  - id: queryline
+    title: "Queryline"
+    link: "queryline.example.com"
+    org: "Python/FastAPI, React/TypeScript, PostgreSQL/pgvector"
+    dates: ""
+    bullets:
+      - text: "Built a searchable knowledge base that answers from internal wikis for AI agents: hybrid search combining pgvector embeddings and BM25 keyword ranking, with an MCP server for search and versioned writes"
 
 education:
   - school: "Pacific State University"
     dates: "Jun 2024"
     detail: "B.S. Computer Science · GPA 3.6/4.0"
+    # Early in a career, real honors and coursework go here, one line each:
+    # lines: ["Honors: Dean's List (5 semesters)", "Coursework: Operating Systems, Databases, Computer Networks"]
 
 skills:
-  Languages: "TypeScript, JavaScript, Python, C++, Rust, SQL"
-  Tools: "React, React Native, Node.js, GraphQL, PostgreSQL, Kubernetes, Docker, Grafana, ROS 2, CI/CD, Git"
+  Languages: "TypeScript, JavaScript, Python, Rust, SQL"
+  Tools: "React, Node.js, GraphQL, FastAPI, Kubernetes, Docker, PostgreSQL, Redis, Grafana, CI/CD, Git"
 
 variants:
   general:
-    projects_order: [trailmix, oss]
+    projects_order: [trailmix, siteforge, queryline]
