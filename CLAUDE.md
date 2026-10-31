@@ -1,6 +1,6 @@
 # AI resume creator and job search
 
-This repository helps one person get more interview callbacks: a one-page resume a recruiter understands, built from
+This repository helps one person get more interview callbacks: a full one-page resume, built from
 an interview about their work, and every open job worth applying to, fetched from employers' own hiring systems,
 read in full and ranked by callback odds. The user applies themselves.
 
@@ -8,7 +8,7 @@ read in full and ranked by callback odds. The user applies themselves.
 
 | The user says | Skill |
 |---|---|
-| "set me up", "get started", `workspace/` doesn't exist, or `python3 -m jobhunt doctor` prints TODO lines | `setup` |
+| "set me up", "get started", `workspace/` doesn't exist, or `python3 -m jobhunt doctor` prints TODO lines and they haven't asked for anything else | `setup` |
 | "use my old resumes", "check my GitHub", "look at my projects" (or right after setup) | `gather-sources` |
 | tells you about their work, new results or numbers; "update my inventory" | `inventory-interview` |
 | "write / fix / tighten my resume", "add this to my resume", "make a systems version" | `resume-workshop` |
@@ -30,6 +30,9 @@ Skills live in `.claude/skills/<name>/SKILL.md`. Follow them step by step.
   edits, no test builds, no trial files until they say go. One decision at a time during fine-tuning.
 - One resume per role family (`workspace/resume.yaml` variants). Never regenerate bullets per posting; never make
   per-company copies. Ship a PDF only when the build reports `status: ok` with empty `lint` and `short_last_lines`.
+- A finished resume is a full page written for the engineer who decides, at the density of `templates/resume.yaml`. A sparse
+  page isn't finished until the interview has nothing left: go back for more material, never pad. When you change the resume
+  rules, run the resume path end to end as a new user and look at the PDF.
 - Rank by callback odds and what the user wants. Explain every exclusion; never silently drop a job. When a fetch is
   partial or a hiring system is unsupported, say so.
 - Decide eligibility; don't ask the user whether they "want" a role. A missing years line is not eligibility.

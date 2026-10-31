@@ -6,9 +6,9 @@ your own Claude Code or ChatGPT/Codex subscription.
 It does two things:
 
 1. **Writes your resume with you.** The AI interviews you about your work, records every fact, then drafts a
-   one-page resume one bullet at a time, with your approval on every change. Every bullet says what you built, with
-   what, and why it mattered, in words a non-technical recruiter can repeat and an engineer respects. A builder turns
-   it into a PDF that fills exactly one page and checks that screening software reads every word.
+   full one-page resume one bullet at a time, with your approval on every change. Every bullet says what you built, with
+   what, and why it mattered: a recruiter can follow the opening, and an engineer respects the rest. A builder turns it
+   into a PDF, refuses a page with a blank band at the bottom, and checks that screening software reads every word.
 2. **Finds the jobs worth sending it to.** For any company you name (or every company in a region), it fetches every
    open posting from the employer's own hiring system, has AI screeners and reviewers read the plausible ones in full
    against your record, checks your application history, and ranks what's left by your odds and what you want. You
@@ -86,19 +86,26 @@ Your files (inventory, profile, resume, application history, runs) live in `work
 
 The full set, with the reason and a before/after for each, is the [resume playbook](docs/RESUME_PLAYBOOK.md).
 
-- **What + how + why.** "Built the Node.js/GraphQL service that lets clinic staff change their schedules (~2M
-  requests/day), so a schedule change takes ~2 minutes instead of a support ticket and a next-day release." A list of
-  tools with no purpose fails, however many keywords it hits.
+- **A full page.** 6–8 entries, 13–15 dense bullets, about 195 characters each, down to the bottom margin. A sparse page
+  fails the build. [This example](examples/jordan-lee/Jordan_Lee_Resume.pdf) shows the target.
+- **Written for the engineer who decides.** The plain "what" opens the bullet for the recruiter, and the technical
+  substance stays after it. A simplified bullet is a failed bullet.
+- **What + how + why.** "Added self-serve scheduling to Brightline's clinic platform through a Node.js/GraphQL service (~2M
+  req/day), enabling clinic managers to change hours and visit types in ~2 minutes, replacing a next-day engineering
+  release." A list of tools with no purpose fails, however many keywords it hits.
+- **Model first.** Real resumes from people in your field who get callbacks, plus research for your role and level.
 - **Gather, then interview.** With your OK it reads your old resumes, reviews, repos and GitHub first, then asks only
   about the gaps and conflicts. Facts are recorded in an inventory; nothing goes on the page that isn't there.
-- **Your real scope.** "Added X through a service", not "built the platform", when you built one layer.
+- **Your real scope, both ways.** "Added X through a service", not "built the platform", when you built one layer. And
+  never one page when the work was platform-wide.
+- **The hardest work gets a bullet,** with the failure named.
 - **Best result where the eye lands,** with its contrast right next to it.
 - **Never drop a number without asking what it measures; never upgrade a status** (projected, A/B tested, merged).
-- **No internal names, team sizes, process trivia or filler.** Plain verbs.
-- **About two lines a bullet; one bold at most;** one page, one column, filled.
+- **No private names, team sizes or filler.** Public technical terms stay, even ones a recruiter won't know.
+- **About two lines a bullet; one bold, two for two results;** one page, one column.
 - **No city in the header; no summary; two skills lines** of things you can be questioned on.
-- **One resume per role family,** chosen by what a posting asks for. Never one per job.
-- **Every build is checked:** one page, text extracts word for word, no odd Unicode, no orphan words.
+- **One resume per role family,** chosen by reading the role. Never one per job.
+- **Every build is checked:** one full page, text extracts word for word, no odd Unicode, no stranded words.
 
 ## The search rules in one screen
 
@@ -124,6 +131,8 @@ python3 -m jobhunt screen-apply workspace/runs/<run>
 python3 -m jobhunt rank workspace/runs/<run>
 python3 -m jobhunt list                            # APPLY_LIST.md + apply_list.html
 python3 -m jobhunt resume --all                    # build every resume variant with all checks
+python3 -m jobhunt resume --check                  # report fit and lines of room; writes no file
+python3 -m jobhunt keywords --companies "A,B,C"    # what postings ask for vs what your page shows
 python3 -m jobhunt watch | fresh list --days 8 | fresh show "Acme" <id>
 python3 -m jobhunt applied add|list|stats|import-email
 python3 -m jobhunt resolve "Acme" | detect <careers-url> | register --name ... --ats ... --token ...

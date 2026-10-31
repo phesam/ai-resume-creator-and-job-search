@@ -1,263 +1,342 @@
 # Resume playbook
 
-How to write a one-page resume that the screening software can read, a non-technical recruiter can understand in
-thirty seconds, and an engineer still respects. Every rule here came out of a week of line-by-line work on a real
-resume (the [case study](CASE_STUDY.md)), and most of them came from a correction: a draft that got rejected, and
-the reason why. The evidence behind the rules is in [EVIDENCE.md](EVIDENCE.md).
+How to write a one-page resume that screening software can read, a recruiter can follow in thirty seconds, and an
+engineer respects. Every rule here came out of a week of line-by-line work on a real resume (the
+[case study](CASE_STUDY.md)), and most came from a draft that got rejected. The evidence is in
+[EVIDENCE.md](EVIDENCE.md).
 
-Examples in this file use fictional people and companies. The edits and the reasons are real.
+Examples use a fictional person. The sentence shapes, the edits and the reasons are real.
 
 ---
 
-## Who reads your resume
+## What a finished page looks like
 
-Three readers, usually in this order. A bullet has to work for all three at once.
+These numbers were measured on the finished case-study resume, from someone with over a year of full-time work. They
+describe what done looks like at that level or above. They aren't a target to pad toward: when the inventory can't reach
+them honestly, interview for more.
 
-| Reader | What it does | What it needs from you |
+| | A finished page |
+|---|---|
+| **Fill** | Text runs to the bottom margin. No blank band, ever. |
+| **Body text** | 10.5–10.9pt. A page that only fills at a bigger size isn't finished. |
+| **Lines of text** | About 54. The build fails a page with a blank band at its roomiest layout, usually around 50 lines |
+| **Entries** | 6–8: every substantial job and project is on the page |
+| **Bullets** | 13–15: about 5 on the newest job, 2 on the next big entry, 1–2 on the rest, one bare line for a minor entry |
+| **Bullet length** | About 195 characters on average. Nearly all run into a second line; 225 at most. A line holds about 108 characters |
+| **Technical depth** | About three distinct technical terms per bullet |
+
+The build enforces fill and text size, and reports the rest under `fill`. `status: underfull` means the page isn't done,
+and it says how many lines are missing. [`examples/jordan-lee`](../examples/jordan-lee) is a page at this density.
+
+**Early in a career, the page still fills, but bullets are only as long as the facts.** Interview first: people forget
+most of what they did. A new graduate's page then fills with internships, teaching, real projects, honors and coursework,
+and more entries with shorter bullets is the honest shape. Stretching a small project to 195 characters is padding.
+
+**When it's done:** the page is full, the build says `ok`, and the interview has nothing left. Say plainly where it falls
+short of the table and why, then stop. If it still can't fill, tell the person how many lines are missing and let them
+decide. A short, honest page beats a padded one.
+
+---
+
+## Who reads it
+
+Three readers. A bullet has to work for all of them at once.
+
+| Reader | What it does | What it needs |
 |---|---|---|
-| **Software** (the ATS, and now AI matchers such as Greenhouse Talent Matching and Ashby's review) | Extracts your text, fills your profile, lets recruiters search it, sorts applicants against the job's criteria. Matches skills by meaning, not by counting words. Does not reject you by itself. | Text that extracts cleanly, standard section names, and the real names of the things you used (React, Kubernetes), inside sentences. |
-| **The recruiter** | Skims for 7 to 30 seconds. Often not an engineer. Often holding a keyword list from the hiring manager. Looks at company names, titles and the first bullet or two of each job. | A recognizable employer and title, the best result where the eye lands, and plain words that say what you built and why it mattered. |
-| **The hiring manager** | Reads the bullets that survived the skim, then interviews you on them. | Real engineering: the system, its scale, your part, the hard part. Nothing you can't talk about for ten minutes. |
+| **Software** (the ATS, and AI matchers such as Greenhouse Talent Matching) | Extracts your text, fills your profile, sorts applicants against the job's criteria. Matches skills by meaning. Doesn't reject you by itself. | Clean text, standard headings, the real names of what you used, inside sentences. |
+| **The recruiter** | Skims for 7 to 30 seconds. Often not an engineer. Often holding a keyword list. Reads company names, titles, and the first words of bullets. | A recognizable employer and title, the best result where the eye lands, and an opening clause that says plainly what you built. |
+| **The hiring manager** | Decides. Reads every bullet, then interviews you on them. | Real engineering: the named system, its scale, your part, the hard part. |
 
-The case study's turning point was accepting that the first reader is not a senior engineer who can fill in what a
-bullet leaves out.
-Drafts written for an engineer read like jargon to the recruiter; drafts written for the recruiter read like
-nothing to the engineer. The fix is one sentence that does both.
+**The default reader of a bullet is the engineer who decides. You serve the recruiter through word order, not by
+simplifying.** The plain "what" goes in the opening clause. The technical substance stays after it.
 
----
+Getting this backward is the most damaging mistake an AI makes here. In the case study, the week went like this: plain
+one-liners simplified for a skimmer were rejected as embarrassing. A dense, technical draft modeled on a strong peer's
+resume was the first one that worked. Fitting that to two lines and adding the "why" came next. The finished page is the
+dense draft plus the why, not a simplified version of it.
 
-## The bullet formula: what, how, why
-
-**What you built or changed** (a noun a stranger recognizes) **+ how** (the technologies, inside the sentence)
-**+ why it mattered** (who it was for, what changed, how big).
-
-> Built the Node.js/GraphQL service that lets clinic staff change their schedules (~2M requests/day), so a schedule
-> change takes **~2 minutes instead of a support ticket and a next-day release**
-
-- What: a service that lets clinic staff change their schedules. A recruiter can repeat that.
-- How: Node.js/GraphQL. The keywords are there, in context, not dumped.
-- Why: ~2 minutes instead of a ticket and a release. Scale: ~2M requests/day.
-
-A list of tools with no purpose fails, even when every tool is one the posting asks for:
-
-> ✗ Deployed and operated the service on the managed Kubernetes platform, configuring namespaces, environments,
-> service-mesh routing, Grafana dashboards, alerts, and on-call support.
-
-That is a setup checklist. The reader learns you touched Kubernetes and learns nothing about what it was for.
-In the case study, proposals like this were rejected as keyword slop: the goal was for anyone reading a bullet to
-understand what was done and why.
-
-### Five tests for every bullet
-
-1. **The repeat test.** Could a recruiter who isn't an engineer say back what you built and what it was for?
-2. **The interview test.** Could you talk about it for ten minutes, including how each number was measured?
-3. **The scope test.** Does it claim only your part? ("Added X through a service" when you built one layer, not
-   "built the platform".)
-4. **The skim test.** Is the best result visible, with its contrast right next to it?
-5. **The stranger test.** Is every name one an outsider knows? Internal service names, team names and acronyms fail.
-
-`python3 -m jobhunt resume` runs automatic versions of some of these (weak openers, no purpose or number, more than
-one bold, keyword stuffing, first person, your banned phrases and internal names) and reports them as `style`
-warnings. A person still decides.
+**A simplified bullet is a failed bullet, even when it's clear.** It reads as work on a single web page.
 
 ---
 
-## The rules, and why each one exists
+## The bullet: what, how, why
 
-### Content
+**What you built or changed + how (the stack, inside the sentence) + why it mattered (who it's for, what changed, how
+big).** Someone should be able to read a bullet and say what you did and why. Keywords belong inside a sentence that has
+a reason in it.
 
-**1. Interview first, draft second.** The resume is built from an inventory of facts collected by asking you
-questions, not from your old resumes and not from guesses. In the case study, four rounds of bullets were rejected
-before the AI stopped guessing and started asking; the person said they had all the information for a perfect
-resume, they just didn't know what was needed. Ask everything missing in one numbered list: why it was built, who
-used it, your part, the result from what to what, the plain meaning of every internal term.
+### Shapes that work
 
-**2. An answer is raw material, not an instruction.** Something you said in the interview does not automatically
-belong on the page. Collect the facts, then choose what earns a place.
+Use these as patterns and vary them. A page of one shape reads as generated.
 
-**3. Say why.** Every bullet carries its reason: the problem before, who it helped, what it made possible.
+**(a) Thing (scale) in stack with senior partners as what it became; tested, shipped, reception.**
+> Rebuilt Brightline's patient booking portal (>600K visits/month) in **React/TypeScript** with heads of Product and
+> Design as a personalized feed of care tasks; A/B tested, then shipped to all patients with >80% positive ratings
 
-**4. Name the system and its scale.** "~250K bookings/month", "~2M requests/day", "8,000+ documents". Scale tells a
-recruiter the work was real without needing to understand it.
+**(b) Capability added through a stack (scale), enabling whom, result, replacing what.** Lead with what didn't exist
+before, at the level of the organization, not the one page where it first appeared.
+> Added self-serve scheduling to Brightline's clinic platform through a Node.js/GraphQL service (~2M req/day), enabling
+> clinic managers to change hours and visit types in **~2 minutes, replacing a next-day engineering release**
 
-**5. Put the best result where the skimmer looks, and keep its contrast next to it.**
-> ✗ ...enabling Operations to publish changes in minutes and configure tests independently, replacing a 1–2 day
-> engineering release cycle
->
-> ✓ ...enabling Operations to make layout and content changes in **~3 minutes, replacing a 1–2 day engineering release**
+**(c) Concrete thing built in a named place, the failure it fixed and how; business stake labeled honestly.** The hardest
+work goes here.
+> Designed and built slot holds in the shared booking service with Redis locks, aligning three teams on a reservation
+> API and fixing a race condition that double-booked providers; supports a projected $1.2M in visits
 
-When "~3 minutes" is six words away from "1–2 days", the contrast is lost. Keep the exact number too: "in minutes"
-was rejected for "~3 minutes".
+**(d) System for a named sponsor: three verbs with a number on each.** "Live" tells the reader it was real.
+> Built a real-time wildfire-detection system for Northgate Aerospace: ingests live satellite thermal feeds over
+> California (900+ frames/min), scores each frame in ~40 ms, and flags new fires on a map for understaffed dispatchers
 
-**6. Your real scope, in your own words.** The case-study candidate built the GraphQL layer that connected a
-company's portal to an existing CMS. A draft said "Built the portal's CMS platform," which reads as if they had built
-the entire CMS. The final wording: "Added CMS capability to the carrier portal through a Node.js/GraphQL service." Precise scope is also the honest scope, and it survives the
-interview.
+**(e) The production-ownership bullet: a colon list.** One bullet may be a list of what you set up, because it proves a
+cluster postings ask for and you really do it. Don't invent a purpose for it; a tacked-on clause reads worse. To shorten
+it, trim the weakest item.
+> Deployed new microservices on Brightline's AWS **Kubernetes** platform: set up API gateway routes and monitoring
+> (Grafana dashboards, metrics, logs, alerts); created runbooks and provide on-call support
 
-**7. Don't diminish your best work.** Words like "prototype" and "built the backend" undersell. The case study's
-strongest project was a sponsored capstone; drafts called it a prototype and put the university on the employer
-line. The final version names the sponsor as the employer, says what the system does and who it is for, and keeps
-the numbers the person could explain.
+**(f) Open source proves itself** by naming the failure classes and how the fix was verified. It needs no metric.
+> Merged **Rust** concurrency fixes to SiteForge's incremental build cache (a data race, a use-after-free in unsafe
+> code), with Python regression suites verified under Miri and ThreadSanitizer
 
-**8. Never drop a number without asking what it measures.** "Performance improved 20%" was cut from a draft for
-having "no baseline." It had one: Lighthouse scores against the old site. The person was right to be angry: a number
-from your own work is not invented just because the AI doesn't know what it means. Ask. Then keep it, reword it, or
-drop it with the person's agreement.
+### What fails
 
-**9. Don't re-ask settled facts.** Once a number or status is confirmed (">70% positive ratings", "projected
-$1.5M", "merged in March"), record it in `decisions.md` under "Fixed facts" and stop questioning it.
+> ✗ Worked on backend APIs and helped migrate services to the cloud.
 
-**10. Exact status.** Achieved vs projected ("supports a projected $1.5M"), shipped vs A/B tested, merged vs in
-review, "not instant end to end" when a background job takes an hour. If a status might change (a PR in review),
-use wording that is true either way ("Contributed fixes"), then update it when it changes.
+A task description. No system, no scale, no reason.
 
-**11. Leave out what doesn't impress the reader.** Team size ("two-person team"), internal process ("needed
-senior-director approval"), raw counts that sound small ("107 test cases"), the number of users in an A/B test,
-"5 more teams are adopting it", "all but two" of anything. None of these make a reader think better of you, and some
-make them wonder.
+> ✗ Developed scalable microservices leveraging Node.js, GraphQL, Kafka, Redis and Kubernetes to drive developer velocity.
 
-**12. No filler.** Rejected in the case study: "increasing developer velocity", "feels instant", "required",
-"modules", "Existing". Also avoid the stiff verbs recruiters now read as AI: spearheaded, leveraged, utilized,
-orchestrated. Plain verbs (built, rebuilt, fixed, added, cut) read as a person.
+Keyword slop: tools with a vague purpose stapled on.
 
-**13. Name things; don't point back with "its."** A bullet that starts "Built its backend" leans on the bullet above
-it. Name the system again or merge the bullets.
+> ✗ Built the app people use to book a doctor, so they can get care faster instead of calling the clinic.
 
-**14. Don't overfit to one posting.** The candidate mentioned on-call runbooks because one posting asked for them;
-the AI rewrote a whole bullet around runbooks. Add a posting's word only where it fits the work cleanly.
+Clear, and worthless to an engineer. This is the simplified failure: a reader learns nothing about the work.
 
-**15. Keywords belong where they are true.** Count which technologies the roles you want actually ask for (in the
-case study, React, TypeScript and Python led across 57 well-matched postings; "full stack" appeared at 8 of 11
-companies; monitoring/on-call at 7 of 11). Then make sure the ones you really used appear in bullets. Never add one
-you didn't use. A skill you can't defend in an interview is a liability.
+### Seven tests for every bullet
 
-**16. Bold one thing per bullet, at most.** The item a skimmer should catch: the main technology or the headline
-result. Unbold anything that doesn't stand on its own ("8,000+ documents", "$1.5M", a secondary language).
+1. **Repeat.** Could a recruiter say back what you built and what it was for? Cover the second half of the bullet: the
+   first half alone must make sense.
+2. **Engineer.** Would a senior engineer at a target company see real work, or a description of a task? Point to the
+   named system and the engineering inside it (architecture, integration, decision, failure handled). If you can't, ask
+   for more and rewrite.
+3. **Impressed.** Would a stranger be impressed, or just informed? If only informed, it needs a stronger claim, a harder
+   problem or more reach.
+4. **Owner.** The person reads it back, recognizes their own work, and can explain every term and defend it for ten
+   minutes, including how each number was measured.
+5. **Scope, both ways.** It claims only their part ("added X through a service", not "built the platform"), and it doesn't
+   undersell (would a reader guess this was one page when it was platform-wide?).
+6. **Skim.** The best result is visible, with its contrast right beside it. "~2 minutes, replacing a next-day release"
+   works. Six words between them kills it.
+7. **Private names.** No internal service, team or product names. Public engineering terms stay, even when a recruiter
+   won't know them and no posting names them. Stripping public terms strips the depth.
 
-### Structure
+`python3 -m jobhunt resume` checks some of this automatically and reports `style` warnings. A person still decides.
 
-**17. About two lines per bullet: one for what, one for why.** Splitting two-line bullets into one-liners was tried
-and rejected: each half lost either the what or the why. No study compares one- and two-line bullets; Huntr's
-guidance is 3 to 5 bullets per role at 150 to 200 characters (the final case-study resume averaged 196). Vary them a
-little so the page isn't one block.
+---
 
-**18. Order bullets by strength and by what recruiters scan for.** The strongest, most recognizable work first:
-the biggest result with the most-asked-for stack (React/TypeScript) led, the AI workflow came second, and the
-backend service with less-asked-for keywords (GraphQL) came third. The AI workflow had been buried at the bottom;
-it moved up.
+## The rules, and why each exists
 
-**19. One page, one column, filled.** The builder fits your content to exactly one page by adjusting font size and
-spacing within readable limits, and fails loudly if it can't. Wider gaps between bullets were added after the first
-build read like one big paragraph.
+### Scope and framing
 
-**20. No summary.** The evidence for summaries is thin, and it costs three lines of real work.
+1. **Interview first; draft second.** The resume comes from an inventory of facts, gathered from what you already have
+   and then by asking. Four rounds of bullets were rejected in the case study before the AI stopped guessing.
+2. **An answer is raw material, not an instruction.** Collect the facts, then choose what earns a place.
+3. **Guard against underclaiming as hard as overclaiming.** Frame work at its true scope: platform-level when it was,
+   not the one page where it first appeared.
+4. **Lead the strongest bullet with what didn't exist before.** Say who couldn't do what, at what level of the
+   organization.
+5. **Know why it mattered before wording it.** If you can't say in one sentence why the work mattered to the
+   organization, ask. Don't reword around the gap.
+6. **Say concretely what the beneficiary can now do,** naming the actions, not a vague word like "changes", and whose old
+   process it replaced.
+7. **Every clause shows what the candidate did.** Delete each clause in turn: if their credit is unchanged, it's a
+   floating fact. Tie it to them or cut it.
+8. **Show the thing made, its breadth and its impact.** Breadth means who beyond their own team uses it.
+9. **Make reality explicit.** Say it ran on live data, real traffic, real users or in production. Otherwise a project
+   reads as a class exercise.
+10. **Your real scope, in your own words.** One layer in front of an existing system is "added X through a service."
+    Precise scope survives the interview.
+11. **Don't diminish your best work.** "Prototype" and "built the backend" undersell. A sponsored project names the sponsor
+    on the employer line and in the title ("Sponsored Capstone"), and says what the system does and for whom.
+12. **The bullets of one job read as one connected story:** what it is, how it was built, what it changed. No bullet depends
+    on one below it.
 
-**21. Skills: two lines, only what you can be questioned on.** No "AI coding tools" line (rejected as keyword
-filler: everyone uses them; it belongs in an interview answer). Remove anything you haven't really used (the
-candidate removed AWS). Drop trivia a hiring manager won't care about (a specific backend-as-a-service brand).
+### Sentence craft
 
-**22. Header: name, phone, email, LinkedIn, GitHub, and citizenship only if it matters.** No city: a non-local city
-gets you filtered out by location searches, and you may want to relocate. Email, LinkedIn and GitHub are clickable in
-the PDF and visible as plain text (recruiters click; parsers read the text). "U.S. Citizen" goes in the header when
-you target defense, space or other export-controlled (ITAR) work; elsewhere it tells a skimmer no sponsorship is
-needed.
+13. **Concrete nouns beat process words.** Name the component, the failure, the behavior. "Design doc" and "aligned teams"
+    may accompany the concrete thing, never replace it.
+14. **Open with a strong noun phrase:** a scope word plus an input-to-output shape ("turns A into B"). The first bullet of
+    the first job has the highest bar: it must read the cleanest on the page.
+15. **Choose the verb by the size of the change.** Fix, add, build, rebuild and redesign mean different things.
+16. **Claim ownership when true:** "designed and built", "led", "owned". Plain doesn't mean modest. Ongoing duties take the
+    present tense ("provide on-call support"), finished work the past.
+17. **Don't upgrade a plain true word.** If it was a dialog, write dialog. Nothing a person wouldn't say out loud.
+18. **Read every bullet aloud.** Reject awkward or resume-voice phrasing even if no rule names it.
+19. **Grammar agreement in lists.** Every item after a verb must work with that verb; each clause after a semicolon has its
+    own verb; paired items take the same form. Things are built *with* a framework and written *in* a language.
+20. **Don't write what the verb implies.** A finished thing is assumed live unless rollout carries a result ("A/B tested,
+    then shipped to all"). Keep short reach words ("company-wide") when true: they carry scale cheaply.
+21. **Keywords are not adjectives.** Don't insert a technology to score a match.
+22. **Fix a correction by changing the claim,** not by adding a defensive qualifier that reads strangely.
+23. **"Its" needs its name on the line above.** "Built its backend" in a separate entry leans on nothing. "Trained its model"
+    directly under the bullet naming the system is fine.
+24. **No filler:** "increasing developer velocity", "feels instant", "various", and the stiff verbs recruiters read as AI
+    ("leveraged", "spearheaded", "utilized", "orchestrated"). Also avoid repeating one shape: several bullets ending
+    ", so ..." or "instead of ..." reads as generated.
 
-**23. Your employer's brand is a signal.** Keep the company name and your title clean and visible on their own line.
-For a sponsored project, put the sponsor on the employer line and say "Sponsored Capstone" in the title.
+### What goes on the page
 
-**24. A startup goes under Projects for big-company applications.** A field experiment (Botelho & Chang) sent 2,400
-applications for entry-level software jobs: former founders got about 43% fewer callbacks. Title it
-"Co-founder & Software Engineer", make the bullets about what you built and for whom, and use one founder label only.
-A startup-facing variant can move it up.
+25. **Every substantial job and project goes on the page first.** A page isn't done until they're all there and the page is
+    full. Then choose what to cut, if anything.
+26. **Never trade a strong entry for a detail.** No substantial entry gets cut to pay for a count or a line of trivia.
+27. **Put in-demand work under the strongest employer,** near the top, not only in projects, when true.
+28. **The hardest work gets its own interview pass and a bullet that shows it.** If they say it was hard and the bullet reads
+    weak, dig deeper before cutting. A real bug or race condition is engineering a manager respects.
+29. **When a clause is weak, ask what it took.** Replace it with what you learn instead of rewording it.
+30. **Ask what past interviewers praised, and protect it** from later cuts.
+31. **Name senior partners and cross-team alignment.** "With heads of Product and Design" and "aligning three teams" show you
+    work with others. That's not trivia. Trivia is team size, approval steps, raw counts that sound small ("107 test cases"),
+    and how many users were in an A/B test.
+32. **A talk, award or adoption note is a clause on the work it belongs to,** never its own bullet.
+33. **Don't dress repeat work as a design win.** Easy repeat work gets a plain clause or merges into another bullet.
+34. **Leave out what signals the wrong thing:** baseline practice listed as an achievement, implementation details that read
+    as naive to an engineer, and skills for work you don't want to do.
+35. **No identifiers or inventories in bullets:** no pull-request or ticket numbers, no feature lists.
+36. **For a big project, build a menu first.** List everything the person did, with their share of it, and let them choose. A
+    broad product gets a breadth bullet, not one small feature. Never leave out shipping and release work.
+37. **Don't make two projects prove the same thing.**
+38. **A startup goes under Projects for big-company applications,** titled "Co-founder & Software Engineer". A field
+    experiment (Botelho & Chang) found former founders get about 43% fewer software-engineering callbacks. A startup-facing
+    variant can move it up.
+39. **Sweep older resume versions once before finalizing,** for anything stronger than the current page.
 
-**25. No dates on projects.** They added nothing and raised questions.
+### Numbers
 
-**26. Keep a weak internship as one line rather than cutting it**, if the page has room: it shows another real job.
-It is the first thing to cut when space runs out.
+40. **Never drop a number without asking what it measures.** "Performance improved 20%" was cut for having no baseline; it had
+    one. A number from your own work isn't invented because the AI doesn't know what it means.
+41. **Exact status.** Projected vs achieved, shipped vs A/B tested, merged vs in review. Check merge status before claiming it.
+    If it might change, use wording true either way.
+42. **One scale number per story.** A second of the same kind adds nothing.
+43. **Don't name the measuring tool when the plain metric reads fine.** "Performance improved 20%" passes. Keep the tool for
+    the interview.
+44. **Keep the exact number you can explain.** "~2 minutes" beats "in minutes". Don't shave a number you can defend because a
+    reviewer finds it odd; do round what you only estimated.
+45. **Don't re-ask settled facts.** Record them in `decisions.md` under "Fixed facts".
 
-**27. GPA on one line; drop the honors list** once you have a full-time job.
+### Keywords and vocabulary
 
-**28. Don't make two projects say the same thing.** If one project already shows MCP and agents, use the other
-project's bullets for something else it uniquely shows (a desktop app, a release pipeline, paying users).
+46. **Count what target postings ask for** (`python3 -m jobhunt keywords --companies "A,B,C"`). It shows which skills you have
+    that the page doesn't show yet. Never add one you didn't use.
+47. **Put a title keyword in a bullet where it's plainly true,** not only in Skills. Audit Skills in both directions: bullets'
+    tools missing from Skills, and Skills items that appear nowhere else, with a reason for each.
+48. **Cap repetition.** Past three uses of one tool, swap extras for the broader word postings use (service, API, backend).
+    Inside one job, don't repeat a result or prove the same skill twice.
+49. **Don't overfit to one posting.** Add a posting's word only where it fits cleanly.
 
-### Format and ATS safety
+### Length and layout
 
-The builder (`jobhunt/resume.py`) enforces these on every build:
+50. **About two lines per bullet: one for what, one for why.** Splitting into one-liners was tried and rejected: each half lost
+    either the what or the why.
+51. **Vary where bullets end.** A page where every bullet fills both lines reads as one block. Never pad to fill a line; the
+    build flags only a stranded word.
+52. **Space is proportional to weight.** A minor entry gets one line. Keep it rather than cut it if the page has room: it
+    shows another real job. It's the first thing to shrink when space runs out.
+53. **Bold the one thing a skimmer should catch** (two only for two separate results): the main technology or the headline
+    result. Unbold anything that doesn't stand alone.
+54. **Order bullets by strength and what's in demand.** The biggest result with the most-asked-for stack first; current
+    in-demand work (an AI workflow, say) high up, never buried. Don't split one story to get it there.
+55. **Wider gaps between bullets, smaller text.** A page with no air reads as one paragraph.
+56. **When a bullet won't fit, keep it one bullet and drop its least important part.** Don't split a story to avoid choosing.
+    A request to lighten a bullet means cut: remove words and report what left.
 
-- Text-based PDF printed by Chrome (the same engine family as Google Docs exports), Times New Roman, kerning and
-  ligatures off so every word extracts with its spaces ("forAction" and "onAWS" were caught before this).
-- Plain ASCII hyphens and spaces. AI tools emit non-breaking hyphens (U+2011) and narrow no-break spaces (U+202F)
-  that break exact-phrase search and some importers. Earlier resumes in the case study had U+2011 inside the phone
-  number and LinkedIn URL.
-- Every bullet, title and skills line must extract word for word; contact details must parse; the name must be the
-  first line.
-- No orphan words: a bullet whose last line is under 30% of the width gets flagged with how many characters to cut.
-- Ship only when the build says `status: ok` with empty `lint` and `short_last_lines`.
+### Entries and headings
+
+57. **Header:** name, phone, email, LinkedIn, GitHub, all plain text, with email and links clickable. No city (a non-local city
+    gets you filtered out). "U.S. Citizen" when you target export-controlled work; elsewhere it's optional, and tells a skimmer
+    no sponsorship is needed.
+58. **No summary.** The evidence is thin, and it costs three lines of real work.
+59. **Skills: two lines, one line each,** only what you can be questioned on (a specialist variant may need a third). No "AI
+    coding tools" filler. Remove what you haven't really used and trivia a hiring manager won't care about.
+60. **Keep the employer's brand clean and visible.** An unknown employer gets a few words of context ("Bay Area edtech
+    startup").
+61. **Title each project by what it is.** No grab-bag heading over several small items.
+62. **No dates on projects.** They add nothing and raise questions.
+63. **GPA on one line when it helps;** a low one can stay off. Honors and coursework come off once you work full time.
+    Students and new graduates keep real ones, one line each under Education.
 
 ---
 
 ## One resume, not one per job
 
-Per-job AI tailoring was the case study's previous approach: about 100 applications with a freshly tailored resume
-each, zero human callbacks. One simple general resume had earlier gotten a final-round interview. The research
-agrees on why: once AI made tailoring free, employers stopped rewarding it (Galdin & Silbert), and hiring managers
-report distrust of AI-sounding applications.
+Per-job AI tailoring was the case study's previous approach: about 100 applications, zero human callbacks. Once AI made
+tailoring free, employers stopped rewarding it (Galdin & Silbert).
 
-What to do instead:
-
-- **A few role-family variants**, each fully polished by you: for example `general` (full-stack, product,
-  platform), `systems` (embedded, C/C++, autonomy), `ai` (LLM and agent tooling). Variants reorder projects and
-  skills, drop an entry, or add a supporting project. They never get new wording per posting.
-- **Choose the variant by what the posting asks, not by the company.** A web role at a defense company gets the
-  general resume. In `profile.yaml`, `posting_must_mention` makes this automatic.
-- **Never swap a strong project for a weak one that hits keywords.** A shipped product with paying users beats a
-  class project, even on an embedded posting. The class project can appear as one supporting line on the variant that
-  needs it ("has this person written code close to hardware at all?").
-- **The one safe per-job edit is reordering the skills lines** so the posting's must-haves come first
-  (`--emphasize "C++,Python"`). It never adds a skill.
+- **A few role-family variants,** each fully polished. Variants reorder projects and skills, drop an entry, or add a
+  supporting project. They never get new wording per posting.
+- **Choose the variant by reading the role, not by the company or a word match.** A term in passing, or one naming another
+  team, doesn't make it a specialist role. A web role at a defense company gets the general resume. `posting_must_mention` in
+  `profile.yaml` suggests a variant; the role's daily work decides.
+- **Never swap a strong project for a weak one that hits keywords.** A class project can be one supporting line on the variant
+  that needs it.
+- **The one safe per-job edit is reordering the skills lines** (`--emphasize "C++,Python"`). It never adds a skill.
 - **No per-company copies.** They go stale. One PDF per variant.
 
 ---
 
-## Numbers
+## Format and ATS safety
 
-- Use a number when you know what it measures, from what to what, and can explain how it was measured.
-- Round to what you actually measured ("~2M requests/day", ">70% positive ratings"). A precise figure is fine when it
-  is the reported result of a defined test and you can explain it.
-- When there is no business metric, use honest proxies: scale (requests, users, documents), adoption (teams using
-  it), speed (minutes instead of days), reliability (incidents, tickets), scope (owned end to end, replaced the old
-  system).
-- If a recruiter could reasonably ask "of what?", answer it in the bullet or pick another number.
+The builder (`jobhunt/resume.py`) enforces these on every build:
+
+- **One full page.** Text fits at 10.5–10.9pt and runs to the bottom margin; the last line or so is spread through the gaps,
+  never left as a band. `overflow` and `underfull` builds go to `.overflow.pdf` and `.underfull.pdf`, never the final path.
+- Text-based PDF printed by Chrome, kerning and ligatures off, so every word extracts with its spaces.
+- Plain ASCII hyphens and spaces. AI tools emit non-breaking hyphens and narrow no-break spaces that break search.
+- Every bullet, title and skills line extracts word for word; contact details parse; the name is the first line.
+- No stranded words, no three-line bullets, no wrapped skills lines, no wrapped contact line.
+
+Ship only when the build says `status: ok` with empty `lint` and `short_last_lines`.
 
 ---
 
 ## Working on it with an AI
 
-The resume workshop skill follows this process. It is the part most people skip, and it is why the result reads as
-yours.
+The `resume-workshop` skill follows this. It's the part most people skip, and it's why the result reads as yours.
 
-1. **Interview** for the facts. Save every answer, dated, in `inventory.md`.
-2. **Count keywords** in current postings you would apply to, so you know which true skills to make visible.
-3. **Propose in chat; wait for a yes; then edit.** At the fine-tuning stage, no test PDFs, no "trial" files and no
-   working ahead. A rendered file with changes in it looks like a change, whatever the AI says about it being a test.
-4. **One bullet at a time.** Offer several wordings (ten, if asked) and let the person pick and adjust. Most final
-   bullets in the case study are the person's own wording, tightened.
-5. **When a part has to go to fit, keep one bullet and drop the least important part.** Don't split a story into two
-   bullets to avoid choosing.
-6. **Check every claim against the inventory before building.** Every overclaim that slipped in was caught this way.
-7. **Get outside reviews, then judge them.** Paste a review from another model or person, and have the AI push back
-   with evidence where the review is wrong. Give the reviewer the latest version, not an old one.
-8. **Keep an editable copy the person can change** (a doc, not YAML), and sync the source to it.
-9. **Record every decision and rejected wording** in `decisions.md`, so nobody argues the same point twice.
-10. **Build, run every check, and read the PDF once as a recruiter would.**
+1. **Gather and interview** until every substantial entry has its why, your part, scale, results and the hard part.
+2. **Get a model.** One or two real resumes from people in your field and at your level who get callbacks. Compare on bullets
+   per job, lines per bullet, technical terms, what they name, and how they show ownership. The first draft that worked in the
+   case study was built this way.
+3. **Research current guidance online** for your role and level. This playbook is a starting point, not a substitute. Say what
+   couldn't be read. Every recommendation carries its evidence and how strong that evidence is.
+4. **Confirm the point before rewording.** State a bullet's single main point and get a yes. After two rejected rewrites, stop
+   generating and ask the person to say it in their own words. Most final bullets are their wording, tightened.
+5. **Propose in chat; wait for a yes; then edit.** At fine-tuning, no test PDFs and no working ahead. A file with changes in it
+   looks like a change, whatever the AI calls it. Use the character budget and `--check` to confirm fit privately.
+6. **One bullet at a time.** Offer several wordings (ten, if asked). A wording called "best" names its criteria.
+7. **Apply exactly what was approved,** nothing bundled with it. Say what's removed and what replaces it. Never remove anything
+   quietly; after merging drafts, list every fact that fell out. A near-final bullet gets the smallest edit.
+8. **Do a cold-recruiter read on every proposed draft,** before showing it.
+9. **Push back on the person's wording too,** with evidence, not only on outside reviews. When calling a phrase weak, say why,
+   in terms of what a reader does with it.
+10. **Check every claim against the inventory before building.** Every overclaim that slipped in was caught this way.
+11. **Get outside reviews, then judge them.** Give a reviewer the latest version and the decisions log, or it re-proposes what
+    was settled. Every addition on a full page names what it replaces.
+12. **Keep one obvious current file** and an editable copy the person can change (a doc, not YAML). Keep open items in a list,
+    and raise them before shipping.
+13. **Record every decision and rejected wording** in `decisions.md`.
 
----
+## Validating it
+
+A simulated skim isn't validation. Have two or three real people in your field do a ten-second test: what do I do, and what was
+most impressive? Then count responses. Callback counts need hundreds of applications to separate two versions (see
+[EVIDENCE.md](EVIDENCE.md)), so judge by those reads, not by a week of silence.
 
 ## Before you send it
 
-- [ ] Every claim is in `inventory.md`, and you can talk about each bullet for ten minutes.
-- [ ] Each bullet passes the repeat, scope, skim and stranger tests.
-- [ ] The build says `status: ok`, `lint: []`, `short_last_lines: []`; you've read the `style` warnings.
+- [ ] Every claim is in `inventory.md`, and you can defend each bullet for ten minutes.
+- [ ] Each bullet passes the seven tests.
+- [ ] The build says `status: ok`, `lint: []`, `short_last_lines: []`, and you've read the `style` warnings.
+- [ ] Side by side with your model resume, it's as full and as technical.
 - [ ] The PDF's text pasted into a plain editor reads in the right order with no odd characters.
 - [ ] The file is named `First_Last_Resume.pdf`.
-- [ ] You are sending the right variant for what this posting asks for.
+- [ ] You're sending the right variant for what this posting asks for.

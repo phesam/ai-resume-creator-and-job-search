@@ -56,7 +56,22 @@ non-breaking hyphens inside the phone number and the LinkedIn URL.
 
 ### Version 3: this workflow (October)
 
-Rebuilt over about a week, one bullet at a time, from an interview about the work. Final bullets (details changed):
+Rebuilt over about a week, from an interview about the work. The order it happened in matters, because the obvious
+reading of it is wrong:
+
+1. **Plain bullets failed first.** An AI drafted clear, simple bullets for a skimming recruiter. They were rejected as
+   embarrassing: they read like work on one web page.
+2. **Four rounds of guessing failed.** Bullets drafted from old resumes were rejected until the AI stopped and asked. The
+   person had every fact; nobody had asked for them.
+3. **A model changed everything.** The person brought in the resume of a strong peer who was getting callbacks. A dense,
+   technical draft built on that resume's shape was the first one they liked.
+4. **Then the why.** Research on how recruiters read showed that bullets needed a purpose, and a plain opening clause a skimmer
+   could follow. The technical substance stayed.
+5. **Then their own words, one bullet at a time.** Most final bullets are the person's wording, tightened. Each stated its point first.
+   The finished page is the dense draft plus the why, not a simplified version of it.
+
+The finished page: 7 entries, 13 bullets averaging about 197 characters, 54 lines at about 10.7pt, about three technical terms per
+bullet, and text down to the bottom margin. Final bullets (details changed):
 
 > Rebuilt the logistics company's carrier-portal homepage (>600K views/week) in **React/TypeScript** with heads of
 > Product and Design as a personalized feed of carrier tasks; A/B tested, then shipped to all carriers with >70%
@@ -91,11 +106,14 @@ And the capstone, which had been called a "prototype" with the university on the
 | "Built the CMS platform" became "Added CMS capability ... through a service" | The person built the layer in front of an existing CMS, not the CMS. Precise scope survives the interview. |
 | "~3 minutes" sits right next to "replacing a 1–2 day engineering release" | The contrast is the result; six words between them killed it. "In minutes" was rejected for the exact number. |
 | The AI workflow moved from last to second | It was strong, current and asked for; it was buried. |
+| Public technical terms stayed, even ones no recruiter knows | They prove depth to the engineer who decides. Only private names came out. |
+| "Designed and built", "aligning three teams", "with heads of Product and Design" | Ownership and senior partners are signal. Team size and approval steps aren't. |
+| Every substantial job and project stayed on the page | Two more entries fit once the bullets were tight. Cutting one for a line of detail was rejected. |
 | Kubernetes, monitoring, runbooks and on-call stayed, in one bullet with a colon | 7 of 11 target companies asked for it, the person really does it, and one earlier interviewer had liked exactly that. |
 | The capstone names the sponsor as the employer, says what the system does and for whom | It was the person's best project; "prototype" and "built the backend" undersold it. |
 | Precise capstone numbers kept | The person could explain exactly what each measured, and had discussed them in an interview. |
 | The race-condition fix is in the onboarding bullet | It was the hardest work of the year; a bug that would have made the site unusable is engineering a manager respects. |
-| No team size, no internal names, no process trivia | A reader gains nothing from knowing the team had two people. |
+| No team size, no private names, no approval steps | A reader gains nothing from knowing the team had two people. |
 | No "increasing developer velocity", "required", "all but two", "5 more teams are adopting it" | Filler, or overclaim, or makes the reader wonder. |
 | Header: no city; "U.S. Citizen" added; email, LinkedIn, GitHub clickable | A non-local city gets filtered; many targets were export-controlled; recruiters click. |
 | Skills cut to two lines; AWS and a backend-as-a-service brand removed | Only things the person could be questioned on, and that a hiring manager would care about. |

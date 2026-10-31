@@ -22,6 +22,18 @@ instead, hold the AI to the same rules.
   measures. A claim's status (merged, projected, A/B tested) is never upgraded.
 - **Don't re-ask settled questions.** Settled facts go in `decisions.md` under "Fixed facts".
 
+## About the page
+
+- **Full is the standard.** A finished page runs to the bottom margin with every substantial entry on it. A tidy, sparse page
+  is a failure, and an `ok` build doesn't make it a success. If it's short, the AI goes back for more material.
+- **Write for the engineer who decides.** Serve the recruiter through word order. An AI left alone drifts toward plain, simple
+  sentences that say nothing. Don't let it.
+- **Look at a model first.** One or two real resumes from people who get callbacks, and research for your role and level. The
+  first draft that worked in the case study came from a model, after four rounds of guessing failed.
+- **Compare before calling it done.** Put it next to the model. If the model looks fuller or more technical, it isn't finished.
+- **State the point, then the wording.** The AI confirms what a bullet is saying before rewording it. After two rejected
+  rewrites, it asks you to say it in your own words.
+
 ## About changes
 
 - **When you ask a question, you get an answer, not an edit.** "Could we split these bullets?" gets a yes or no, the
@@ -29,6 +41,8 @@ instead, hold the AI to the same rules.
   rendered file with changes in it reads as a change, whatever the AI calls it.
 - **Don't work ahead during fine-tuning.** One decision at a time. Private test builds of options you haven't asked
   for waste your time and tokens.
+- **Apply exactly what was approved.** Nothing bundled with it. The AI says what's removed and what replaces it, and never
+  removes anything quietly.
 - **One resume per role family.** No per-company copies, no regenerating bullets per posting.
 
 ## About communication

@@ -17,9 +17,11 @@ comfortable with that, add this to `.claude/settings.local.json` in the repo (it
 | "No Chrome, Chromium or Edge found" | Install Google Chrome, or set `CHROME_PATH` to the browser executable. |
 | `pdftotext` not found | macOS: `brew install poppler`. Ubuntu/Debian: `sudo apt install poppler-utils`. Windows: install poppler and add its `bin` to PATH. |
 | "Chrome did not produce a PDF in time" | Run the build again; headless Chrome occasionally hangs. |
-| `status: overflow` | The content doesn't fit on one page even at the most compact layout. Cut a bullet (the weakest internship first, then the weakest project). |
-| `status: underfull` | More than half an inch is empty even at the roomiest layout. Add a bullet or a project. |
-| `short_last_lines` | A bullet wraps onto a nearly empty line. The message says how many characters to cut; or add a few words of detail. |
+| `status: overflow` | The content doesn't fit on one page even at the most compact layout. Cut in this order: a minor entry down to one line, the weakest project bullet, the weakest main-job bullet. |
+| `status: underfull` | The page has a blank band at the roomiest layout, and the note says how many lines are missing. The PDF goes to `.underfull.pdf`. Add real work from the inventory; if it's used up, go back to the interview. Early in a career, class projects, coursework and honors count. Never pad, and never grow the text. |
+| `short_last_lines` | A stranded word, or a bullet running to three lines. Trim the characters it names. Don't add words to reach further. |
+| `fill` shows a low `avg_bullet_chars` or few `technical_terms` | The bullets are thin or plain, even if the page fits. Compare to [`templates/resume.yaml`](../templates/resume.yaml) and ask what each piece of work took. |
+| Checking fit during fine-tuning | `python3 -m jobhunt resume --check` reports fit and lines of room, and writes no file. |
 | `lint: text does not extract verbatim near '...'` | Usually an odd character or a word broken across lines. Retype hyphens and quotes in that bullet. |
 | A line cut short in the PDF | An unquoted ` #` in `resume.yaml` starts a YAML comment. Quote every string. |
 | `No module named 'yaml'` | You're running a different Python than the one you installed packages into. Use `python3 -m pip install -r requirements.txt` with the same `python3`. |
